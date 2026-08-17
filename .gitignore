@@ -1,0 +1,11 @@
+node_modules/
+npm-debug.log*
+
+# Xcode / iOS build products (the ios/.gitignore also covers build-time generated files)
+ios/App/build/
+ios/App/output/
+ios/App/DerivedData/
+*.xcuserstate
+xcuserdata/
+
+.DS_Store

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dub Siren">
+<meta name="theme-color" content="#101B15">
+<title>Dub Siren MK-1</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="chassis">
+  <i class="screw tl"></i><i class="screw tr"></i>
+  <i class="screw bl"></i><i class="screw br"></i>
+
+  <header>
+    <h1>Dub Siren</h1>
+    <span class="led" id="led"></span>
+    <span class="model">MK-1</span>
+  </header>
+
+  <canvas class="scope" id="scope" aria-hidden="true"></canvas>
+
+  <div class="plate-wrap">
+    <canvas class="plate" id="plate" role="application"
+      aria-label="Placa táctil: horizontal cambia el tono, vertical la velocidad del barrido. Mantén pulsado para sonar."></canvas>
+    <span class="plate-tag">◀ PITCH ▶</span>
+    <span class="plate-tag right">▲ RATE ▼</span>
+  </div>
+
+  <div class="btnrow">
+    <button class="btn latch" id="latch" aria-pressed="false">Latch</button>
+    <button class="btn blood" id="blast">Feedback</button>
+  </div>
+
+  <div class="rule">SIREN</div>
+
+  <div class="ctrl">
+    <label>WAVE</label>
+    <div class="chips" id="wave">
+      <button class="chip" data-v="sine" aria-pressed="true">∿</button>
+      <button class="chip" data-v="triangle" aria-pressed="false">△</button>
+      <button class="chip" data-v="sawtooth" aria-pressed="false">◺</button>
+      <button class="chip" data-v="square" aria-pressed="false">⊓</button>
+    </div>
+  </div>
+
+  <div class="ctrl">
+    <label>SWEEP</label>
+    <div class="chips" id="shape">
+      <button class="chip" data-v="sine" aria-pressed="true">∿</button>
+      <button class="chip" data-v="triangle" aria-pressed="false">△</button>
+      <button class="chip" data-v="sawtooth" aria-pressed="false">◺</button>
+      <button class="chip" data-v="square" aria-pressed="false">⊓</button>
+      <button class="chip" data-v="random" aria-pressed="false">⁘</button>
+    </div>
+  </div>
+
+  <div class="ctrl">
+    <label>PITCH</label>
+    <input type="range" id="pitch" min="0" max="1000" value="420">
+    <output id="pitchV">—</output>
+  </div>
+  <div class="ctrl">
+    <label>RATE</label>
+    <input type="range" id="rate" min="0" max="1000" value="330">
+    <output id="rateV">—</output>
+  </div>
+  <div class="ctrl">
+    <label>DEPTH</label>
+    <input type="range" id="depth" min="0" max="1000" value="480">
+    <output id="depthV">—</output>
+  </div>
+  <div class="ctrl">
+    <label>SPREAD</label>
+    <input type="range" id="spread" min="0" max="1000" value="90">
+    <output id="spreadV">—</output>
+  </div>
+
+  <div class="rule">ECHO</div>
+
+  <div class="ctrl">
+    <label>TIME</label>
+    <input type="range" id="dtime" min="0" max="1000" value="420">
+    <output id="dtimeV">—</output>
+  </div>
+  <div class="ctrl">
+    <label>REPEATS</label>
+    <input type="range" id="fback" min="0" max="1000" value="620">
+    <output id="fbackV">—</output>
+  </div>
+  <div class="ctrl">
+    <label>TONE</label>
+    <input type="range" id="tone" min="0" max="1000" value="520">
+    <output id="toneV">—</output>
+  </div>
+  <div class="ctrl">
+    <label>SEND</label>
+    <input type="range" id="send" min="0" max="1000" value="700">
+    <output id="sendV">—</output>
+  </div>
+
+  <div class="rule">OUT</div>
+
+  <div class="ctrl">
+    <label>VOLUME</label>
+    <input type="range" id="vol" min="0" max="1000" value="700">
+    <output id="volV">—</output>
+  </div>
+
+  <div class="presets" id="presets">
+    <button class="preset" data-p="airraid">AIR RAID</button>
+    <button class="preset" data-p="police">POLICE</button>
+    <button class="preset" data-p="laser">LASER</button>
+    <button class="preset" data-p="ufo">UFO</button>
+    <button class="preset" data-p="whoop">WHOOP</button>
+    <button class="preset" data-p="steppa">STEPPA</button>
+  </div>
+</div>
+
+<footer>
+  Mantén el dedo en la placa para que suene. <b>Latch</b> lo deja sonando solo.<br>
+  Si no oyes nada, quita el modo silencio del iPhone y sube el volumen.
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
