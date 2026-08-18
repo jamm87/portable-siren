@@ -6,6 +6,13 @@ A dub siren synthesizer (Web Audio API). You can install it a few ways:
 2. **As an installable web app (PWA)** on iPhone — no Xcode, no Mac, no TestFlight. See [Install on iPhone without Xcode](#install-on-iphone-without-xcode-pwa) below.
 3. **As a native iOS app with Capacitor + Xcode** — needs a Mac. See [Build as a native iOS app](#build-as-a-native-ios-app-needs-a-mac) below.
 
+### ⬇️ Quick links
+
+| | |
+|---|---|
+| **Download the Android APK** | **[DubSiren.apk](https://github.com/jamm87/portable-siren/releases/download/android-latest/DubSiren.apk)** — open this link on the phone in Chrome, then install. Always the latest build from `main`. |
+| **Use it in the browser / install as PWA** | **[jamm87.github.io/portable-siren](https://jamm87.github.io/portable-siren/)** — works on any device with a modern browser; on iPhone, open in Safari and use "Add to Home Screen" (see below). |
+
 ## Structure
 
 ```
