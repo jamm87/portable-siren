@@ -348,4 +348,11 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
     document.addEventListener("visibilitychange", () => { if (document.hidden) stopForBackground(); });
   }
 }
+
+/* ---------------- PWA: registra el service worker para uso offline ---------------- */
+if ("serviceWorker" in navigator && !(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
 })();

@@ -1,19 +1,47 @@
 # Dub Siren MK-1
 
-Sintetizador de sirena dub (Web Audio API) empaquetado como app nativa de iOS con [Capacitor](https://capacitorjs.com).
+Sintetizador de sirena dub (Web Audio API). Se puede instalar en el iPhone de dos formas:
+
+1. **Como app web instalable (PWA)** — sin Xcode, sin Mac, sin TestFlight. Es la forma recomendada si solo quieres tenerla en tu iPhone ya. Ver [Instalar en el iPhone sin Xcode](#instalar-en-el-iphone-sin-xcode-pwa) más abajo.
+2. **Como app nativa con Capacitor + Xcode** — necesita un Mac. Ver [Compilar como app nativa de iOS](#compilar-como-app-nativa-de-ios-necesita-un-mac) más abajo.
 
 ## Estructura
 
 ```
-www/                  código web (la app en sí: HTML/CSS/JS, sin dependencias)
+www/                     código web (la app en sí: HTML/CSS/JS, sin dependencias)
   index.html
   style.css
   app.js
-capacitor.config.json  configuración de Capacitor (appId, appName, webDir)
-ios/                   proyecto nativo de Xcode, generado por Capacitor
+  manifest.json          manifest de la PWA (icono, nombre, modo standalone)
+  sw.js                  service worker: cachea la app para que funcione offline
+  icons/                 iconos de la PWA
+.github/workflows/pages.yml  publica www/ en GitHub Pages en cada push a main
+capacitor.config.json    configuración de Capacitor (appId, appName, webDir)
+ios/                     proyecto nativo de Xcode, generado por Capacitor
 ```
 
-`www/` es una app web normal y autocontenida: se puede abrir `www/index.html` directamente en un navegador (o servirla con cualquier servidor estático) para probar el sonido antes de tocar Xcode.
+`www/` es una app web normal y autocontenida: se puede abrir `www/index.html` directamente en un navegador para probar el sonido sin instalar nada.
+
+## Instalar en el iPhone sin Xcode (PWA)
+
+Esto se prepara entero desde Windows (o cualquier SO), no hace falta Mac.
+
+**Publicar la app (una vez, desde GitHub, en el navegador):**
+
+1. En `github.com/jamm87/portable-siren` → **Settings** → **Pages**.
+2. En "Build and deployment" → "Source", elige **GitHub Actions** (no "Deploy from a branch").
+3. Con eso ya está: el workflow `.github/workflows/pages.yml` publica automáticamente el contenido de `www/` en cada push a `main`. Puedes ver el progreso en la pestaña **Actions** del repo; cuando termine, la URL aparece en Settings → Pages, con esta forma: `https://jamm87.github.io/portable-siren/`.
+
+**Instalar en el iPhone:**
+
+1. Abre esa URL en **Safari** en el iPhone (tiene que ser Safari, no Chrome ni otro navegador — solo Safari puede instalar apps web en iOS).
+2. Toca el icono de **Compartir** (el cuadrado con la flecha hacia arriba).
+3. Desplázate y toca **"Añadir a pantalla de inicio"**.
+4. Confirma el nombre ("Dub Siren") y toca **Añadir**.
+
+Te queda un icono en la pantalla de inicio, a pantalla completa (sin la barra de Safari), con el mismo icono dorado que la app nativa, y funciona sin conexión gracias al service worker. Cada vez que actualices `www/` y hagas push a `main`, el despliegue se repite solo; para ver los cambios en el iPhone basta con recargar la página una vez con conexión (el service worker se actualiza solo) o borrar y volver a añadir el icono si hace falta forzarlo.
+
+## Compilar como app nativa de iOS (necesita un Mac)
 
 ## Requisitos
 
