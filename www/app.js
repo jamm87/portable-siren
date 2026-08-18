@@ -1,14 +1,14 @@
 (() => {
 "use strict";
 
-/* ---------------- parámetros y mapeos ---------------- */
+/* ---------------- parameters and mappings ---------------- */
 const el = id => document.getElementById(id);
 const clamp = (v,a,b) => Math.min(b,Math.max(a,v));
 const lerp  = (a,b,t) => a+(b-a)*t;
-const logMap= (t,a,b) => a*Math.pow(b/a,t);          // t 0..1 -> a..b logarítmico
+const logMap= (t,a,b) => a*Math.pow(b/a,t);          // t 0..1 -> a..b logarithmic
 const unlog = (v,a,b) => Math.log(v/a)/Math.log(b/a);
 
-const P = {                       // valores normalizados 0..1
+const P = {                       // normalized 0..1 values
   pitch:.42, rate:.33, depth:.48, spread:.09,
   dtime:.42, fback:.62, tone:.52, send:.70, vol:.70,
   wave:"sine", shape:"sine"
@@ -21,7 +21,7 @@ const DTIME = () => logMap(P.dtime, .035, 1.1);
 const FB    = () => P.fback * .92;
 const TONE  = () => logMap(P.tone, 260, 9000);
 
-/* ---------------- audio ---------------- */
+/* ---------------- audio engine ---------------- */
 let ctx, master, comp, dry, osc1, osc2, mix, voice,
     lfo, lfoRand, lfoAmt, send, delay, fbGain, fbFilt, hp, sat, echoOut;
 let ready = false, playing = false, latch = false, blast = false;
@@ -44,7 +44,7 @@ function build(){
   comp.ratio.value = 14; comp.attack.value = .003; comp.release.value = .18;
   master.connect(comp).connect(ctx.destination);
 
-  // voz
+  // voice
   voice = ctx.createGain(); voice.gain.value = 0;
   mix   = ctx.createGain(); mix.gain.value = .5;
   osc1 = ctx.createOscillator(); osc2 = ctx.createOscillator();
@@ -59,7 +59,7 @@ function build(){
   lfoRand = ctx.createConstantSource(); lfoRand.offset.value = 0;
   lfoAmt.connect(osc1.detune); lfoAmt.connect(osc2.detune);
 
-  // eco
+  // echo
   dry = ctx.createGain(); dry.gain.value = 1;
   send = ctx.createGain(); send.gain.value = P.send;
   delay = ctx.createDelay(1.5); delay.delayTime.value = DTIME();
@@ -104,7 +104,7 @@ function apply(){
   osc2.detune.setTargetAtTime(SPREAD(), t, .02);
   lfo.frequency.setTargetAtTime(RATE(), t, .02);
   lfoAmt.gain.setTargetAtTime(CENTS(), t, .02);
-  delay.delayTime.setTargetAtTime(DTIME(), t, .09);   // glide tipo cinta
+  delay.delayTime.setTargetAtTime(DTIME(), t, .09);   // tape-style glide
   fbGain.gain.setTargetAtTime(blast ? .99 : FB(), t, .03);
   fbFilt.frequency.setTargetAtTime(TONE(), t, .03);
   send.gain.setTargetAtTime(P.send, t, .03);
@@ -165,7 +165,7 @@ function syncChips(){
   [...el("shape").children].forEach(c => c.setAttribute("aria-pressed", c.dataset.v === P.shape));
 }
 
-/* ---------------- botones ---------------- */
+/* ---------------- buttons ---------------- */
 const latchBtn = el("latch");
 latchBtn.addEventListener("click", () => {
   latch = !latch;
@@ -197,7 +197,7 @@ el("presets").addEventListener("click", e => {
   build(); setWave(P.wave); setShape(P.shape); syncChips(); refresh();
 });
 
-/* ---------------- placa táctil ---------------- */
+/* ---------------- touch plate ---------------- */
 const plate = el("plate"), pctx = plate.getContext("2d");
 const scope = el("scope"), sctx = scope.getContext("2d");
 let plateW = 0, plateH = 0, scopeW = 0, scopeH = 0;
@@ -239,7 +239,7 @@ const release = e => {
 plate.addEventListener("pointerup", release);
 plate.addEventListener("pointercancel", release);
 
-/* ---------------- dibujo ---------------- */
+/* ---------------- drawing ---------------- */
 const led = el("led");
 const shapeFn = {
   sine:   p => Math.sin(2*Math.PI*p),
@@ -254,7 +254,7 @@ function draw(now){
   requestAnimationFrame(draw);
   const t = now/1000;
 
-  // S&H para el barrido aleatorio
+  // sample & hold for the random sweep
   const r = RATE();
   if (t - randLast >= 1/r){
     randLast = t; randVal = Math.random()*2 - 1;
@@ -268,7 +268,7 @@ function draw(now){
 
   led.classList.toggle("on", playing && phase < .5);
 
-  /* --- scope: traza de tono en vivo --- */
+  /* --- scope: live pitch trace --- */
   trace.push(f); if (trace.length > 180) trace.shift();
   sctx.clearRect(0,0,scopeW,scopeH);
   sctx.fillStyle = "#060A07"; sctx.fillRect(0,0,scopeW,scopeH);
@@ -288,7 +288,7 @@ function draw(now){
   if (playing){ sctx.shadowColor = "rgba(201,162,39,.85)"; sctx.shadowBlur = 7; }
   sctx.stroke(); sctx.shadowBlur = 0;
 
-  /* --- placa --- */
+  /* --- plate --- */
   pctx.clearRect(0,0,plateW,plateH);
   pctx.fillStyle = "#0A130D"; pctx.fillRect(0,0,plateW,plateH);
   pctx.strokeStyle = "rgba(232,226,206,.055)"; pctx.lineWidth = 1;
@@ -322,7 +322,7 @@ function draw(now){
 resize();
 requestAnimationFrame(draw);
 
-/* desbloqueo de audio al primer toque en cualquier sitio */
+/* unlock audio on the first tap anywhere */
 document.addEventListener("pointerdown", function once(){
   build();
   if (ctx && ctx.state === "suspended") ctx.resume();
@@ -331,7 +331,7 @@ document.addEventListener("pointerdown", function once(){
 
 document.addEventListener("gesturestart", e => e.preventDefault());
 
-/* ---------------- integración con la app nativa iOS (Capacitor) ---------------- */
+/* ---------------- native iOS app integration (Capacitor) ---------------- */
 if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()){
   const stopForBackground = () => {
     latch = false;
@@ -342,14 +342,14 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
 
   const CapApp = window.Capacitor.Plugins && window.Capacitor.Plugins.App;
   if (CapApp && CapApp.addListener){
-    // Silencia y suspende el audio al pasar a segundo plano (llamada entrante, Centro de Control, home, etc).
+    // Mute and suspend audio when going to the background (incoming call, Control Center, home, etc).
     CapApp.addListener("appStateChange", ({ isActive }) => { if (!isActive) stopForBackground(); });
   } else {
     document.addEventListener("visibilitychange", () => { if (document.hidden) stopForBackground(); });
   }
 }
 
-/* ---------------- PWA: registra el service worker para uso offline ---------------- */
+/* ---------------- PWA: register the service worker for offline use ---------------- */
 if ("serviceWorker" in navigator && !(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())){
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("sw.js").catch(() => {});

@@ -1,7 +1,7 @@
 {
   "name": "Dub Siren MK-1",
   "short_name": "Dub Siren",
-  "description": "Sintetizador de sirena dub con Web Audio API.",
+  "description": "Dub siren synthesizer built with the Web Audio API.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
