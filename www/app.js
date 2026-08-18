@@ -331,7 +331,7 @@ document.addEventListener("pointerdown", function once(){
 
 document.addEventListener("gesturestart", e => e.preventDefault());
 
-/* ---------------- native iOS app integration (Capacitor) ---------------- */
+/* ---------------- native app integration (Capacitor: iOS + Android) ---------------- */
 if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()){
   const stopForBackground = () => {
     latch = false;
@@ -344,6 +344,11 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
   if (CapApp && CapApp.addListener){
     // Mute and suspend audio when going to the background (incoming call, Control Center, home, etc).
     CapApp.addListener("appStateChange", ({ isActive }) => { if (!isActive) stopForBackground(); });
+
+    if (window.Capacitor.getPlatform && window.Capacitor.getPlatform() === "android"){
+      // Android's hardware/gesture back button: there's no in-app navigation, so exit.
+      CapApp.addListener("backButton", () => CapApp.exitApp());
+    }
   } else {
     document.addEventListener("visibilitychange", () => { if (document.hidden) stopForBackground(); });
   }

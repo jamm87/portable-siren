@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Dub Siren</string>
+    <string name="title_activity_main">Dub Siren</string>
+    <string name="package_name">com.jamm87.dubsiren</string>
+    <string name="custom_url_scheme">com.jamm87.dubsiren</string>
+</resources>
