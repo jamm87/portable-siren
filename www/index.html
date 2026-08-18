@@ -16,6 +16,13 @@
 </head>
 <body>
 
+<div class="power" id="power">
+  <h2>Dub Siren</h2>
+  <button id="powerBtn">Power On</button>
+  <p>iOS needs a tap to open audio.<br>
+     Turn off the silent switch before you start.</p>
+</div>
+
 <div class="chassis">
   <i class="screw tl"></i><i class="screw tr"></i>
   <i class="screw bl"></i><i class="screw br"></i>
@@ -30,7 +37,7 @@
 
   <div class="plate-wrap">
     <canvas class="plate" id="plate" role="application"
-      aria-label="Touch plate: horizontal changes pitch, vertical changes sweep rate. Hold down to sound."></canvas>
+      aria-label="Multitouch plate: each finger creates its own siren. Horizontal changes pitch, vertical changes sweep rate."></canvas>
     <span class="plate-tag">◀ PITCH ▶</span>
     <span class="plate-tag right">▲ RATE ▼</span>
   </div>
@@ -123,11 +130,17 @@
     <button class="preset" data-p="whoop">WHOOP</button>
     <button class="preset" data-p="steppa">STEPPA</button>
   </div>
+
+  <div class="status">
+    AUDIO: <b id="stat">standby</b>
+    <button id="test">TEST TONE</button>
+  </div>
 </div>
 
 <footer>
-  Keep your finger on the plate to sound it. <b>Latch</b> lets it keep sounding on its own.<br>
-  If you hear nothing, turn off silent mode on your iPhone and turn up the volume.
+  Each finger on the plate is its own siren, up to six at once.<br>
+  With <b>Latch</b>, lifting your finger keeps the voice sounding: touch it again to
+  move it, or give it a short tap to remove it.
 </footer>
 
 <script src="app.js"></script>
