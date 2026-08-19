@@ -249,9 +249,11 @@ const PRESETS = {
   // Rising sawtooth ramp from 150 Hz to 620 Hz repeated a bit faster than
   // once a second — the classic "whoop-whoop" rising alarm.
   whoop:  {pitch:.52,rate:.39,depth:.29,spread:.06,dtime:.40,fback:.55,tone:.50,send:.60,wave:"sine",shape:"sawtooth"},
-  // Low, buzzy square tone stepping between 120 Hz and 190 Hz roughly
-  // every half second, drowned in a heavy, dark dub delay throw.
-  steppa: {pitch:.33,rate:.38,depth:.10,spread:.10,dtime:.45,fback:.85,tone:.30,send:.85,wave:"square",shape:"square"}
+  // Pure classic dub siren: plain sine tone, sine sweep, zero detune (no
+  // chorus/beating — just the one clean pitch). Warbles smoothly between
+  // ~300 Hz and ~600 Hz about once a second, thrown into a long, heavy-
+  // feedback dub echo — the King Tubby-style "siren pon the riddim".
+  dub: {pitch:.61,rate:.39,depth:.29,spread:0,dtime:.69,fback:.87,tone:.56,send:.62,wave:"sine",shape:"sine"}
 };
 el("presets").addEventListener("click", e => {
   const b = e.target.closest(".preset"); if (!b) return;
