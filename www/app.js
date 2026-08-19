@@ -205,12 +205,18 @@ stopBtn.addEventListener("click", () => {
 
 /* ---------------- tap tempo (sets RATE) ---------------- */
 const tapBtn = el("tap");
+const TAP_LABEL = "Tap";
 let tapTimes = [];
+let tapResetTimer = null;
 tapBtn.addEventListener("click", () => {
   const now = performance.now();
   if (tapTimes.length && now - tapTimes[tapTimes.length-1] > 2000) tapTimes = []; // idle too long: restart
   tapTimes.push(now);
   if (tapTimes.length > 5) tapTimes.shift();      // average the last few taps
+
+  clearTimeout(tapResetTimer);
+  tapResetTimer = setTimeout(() => { tapTimes = []; tapBtn.textContent = TAP_LABEL; }, 2000);
+
   if (tapTimes.length < 2) return;                // need at least one interval
   const intervals = [];
   for (let i=1;i<tapTimes.length;i++) intervals.push(tapTimes[i]-tapTimes[i-1]);
@@ -218,6 +224,7 @@ tapBtn.addEventListener("click", () => {
   const hz = clamp(1000/avgMs, .15, 28);
   P.rate = clamp(unlog(hz, .15, 28), 0, 1);
   refresh();
+  tapBtn.textContent = Math.round(hz*60) + " BPM";
 });
 
 /* ---------------- presets ---------------- */
