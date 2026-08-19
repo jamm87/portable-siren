@@ -37,13 +37,14 @@
 
   <div class="plate-wrap">
     <canvas class="plate" id="plate" role="application"
-      aria-label="Multitouch plate: each finger creates its own siren. Horizontal changes pitch, vertical changes sweep rate."></canvas>
+      aria-label="Touch plate: horizontal changes pitch, vertical changes sweep rate. Hold down to sound."></canvas>
     <span class="plate-tag">◀ PITCH ▶</span>
     <span class="plate-tag right">▲ RATE ▼</span>
   </div>
 
   <div class="btnrow">
     <button class="btn latch" id="latch" aria-pressed="false">Latch</button>
+    <button class="btn" id="stop">Stop</button>
     <button class="btn blood" id="blast">Feedback</button>
   </div>
 
@@ -138,9 +139,9 @@
 </div>
 
 <footer>
-  Each finger on the plate is its own siren, up to six at once.<br>
-  With <b>Latch</b>, lifting your finger keeps the voice sounding: touch it again to
-  move it, or give it a short tap to remove it.
+  Keep your finger on the plate to sound it. <b>Latch</b> lets it keep sounding on its own —
+  tap <b>Stop</b> to cut it, echo tail included.<br>
+  If you hear nothing, turn off silent mode on your phone and turn up the volume.
 </footer>
 
 <script src="app.js"></script>

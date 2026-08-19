@@ -120,10 +120,11 @@ Neither is set up yet.
 
 ## Using the app
 
-- Tap **Power On** first — iOS (and most mobile browsers) require a tap before they'll let a page play audio.
-- The plate is **multitouch/polyphonic**: each finger you put down starts its own siren voice (up to 6 at once), independently movable — horizontal changes that voice's **pitch**, vertical changes its **sweep rate**.
-- **Latch** keeps voices sounding after you lift your finger. With Latch on, touching near a held voice picks it back up to move it; a short tap on it removes it. Turning Latch off drops every voice that isn't currently held by a finger.
+- Tap **Power On** first — iOS (and most mobile browsers) require a tap before they'll let a page play audio. This just unlocks the audio engine, no sound plays until you touch the plate.
+- Hold your finger on the center plate: the horizontal axis changes **pitch**, the vertical axis changes the **sweep rate**.
+- **Latch** keeps the siren sounding without holding your finger down.
+- **Stop** cuts the siren immediately — but only the dry tone. If there's echo/feedback going, the delay trail keeps ringing out on its own instead of being chopped off dead.
 - **Feedback** drives the echo feedback to maximum while held.
-- **SIREN** controls (waveform, sweep shape, pitch, rate, depth, spread), **ECHO** (time, repeats, tone, send), and **OUT** (volume) apply to all voices at once; the PITCH/RATE sliders track whichever voice you touched last.
+- **SIREN** controls (waveform, sweep shape, pitch, rate, depth, spread), **ECHO** (time, repeats, tone, send), and **OUT** (volume).
 - The status line at the bottom shows the audio engine state and sample rate, plus a **TEST TONE** button to confirm sound is working.
-- Quick presets: AIR RAID, POLICE, LASER, UFO, WHOOP, STEPPA.
+- Quick presets: AIR RAID, POLICE, LASER, UFO, WHOOP, STEPPA — each tuned to a distinct character (see the comments above the `PRESETS` object in `www/app.js` for the sound-design reasoning behind each one). If one doesn't quite land for you, the sliders show exactly what values it set, so you can nudge it from there.
