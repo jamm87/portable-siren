@@ -22,9 +22,8 @@ const TONE  = () => logMap(P.tone, 260, 9000);
 
 /* ---------------- audio engine ---------------- */
 let ctx, master, comp, dry, osc1, osc2, mix, voice,
-    lfo, lfoRand, lfoAmt, send, delay, fbGain, fbFilt, hp, sat, echoOut;
+    lfo, lfoAmt, send, delay, fbGain, fbFilt, hp, sat, echoOut;
 let ready = false, playing = false, latch = false, blast = false;
-let randVal = 0, randLast = 0;
 
 /* --- status shown in the panel --- */
 function status(m){ const e = el("stat"); if (e) e.textContent = m; }
@@ -67,7 +66,6 @@ function build(){
   // LFO
   lfoAmt = ctx.createGain(); lfoAmt.gain.value = CENTS();
   lfo = ctx.createOscillator(); lfo.type = "sine"; lfo.frequency.value = RATE();
-  lfoRand = ctx.createConstantSource(); lfoRand.offset.value = 0;
   lfoAmt.connect(osc1.detune); lfoAmt.connect(osc2.detune);
 
   // echo
@@ -86,7 +84,7 @@ function build(){
   delay.connect(fbFilt).connect(hp).connect(sat).connect(fbGain).connect(delay);
   delay.connect(echoOut).connect(master);
 
-  osc1.start(); osc2.start(); lfo.start(); lfoRand.start();
+  osc1.start(); osc2.start(); lfo.start();
   ready = true;
   setShape(P.shape);
   statusAuto();
@@ -138,9 +136,7 @@ function setShape(s){
   P.shape = s;
   if (!ready) return;
   try{ lfo.disconnect(lfoAmt); }catch(e){}
-  try{ lfoRand.disconnect(lfoAmt); }catch(e){}
-  if (s === "random"){ lfoRand.connect(lfoAmt); }
-  else { lfo.type = s; lfo.connect(lfoAmt); }
+  lfo.type = s; lfo.connect(lfoAmt);
 }
 
 /* ---------------- sliders ---------------- */
@@ -207,26 +203,48 @@ stopBtn.addEventListener("click", () => {
   off();
 });
 
+/* ---------------- tap tempo (sets RATE) ---------------- */
+const tapBtn = el("tap");
+let tapTimes = [];
+tapBtn.addEventListener("click", () => {
+  const now = performance.now();
+  if (tapTimes.length && now - tapTimes[tapTimes.length-1] > 2000) tapTimes = []; // idle too long: restart
+  tapTimes.push(now);
+  if (tapTimes.length > 5) tapTimes.shift();      // average the last few taps
+  if (tapTimes.length < 2) return;                // need at least one interval
+  const intervals = [];
+  for (let i=1;i<tapTimes.length;i++) intervals.push(tapTimes[i]-tapTimes[i-1]);
+  const avgMs = intervals.reduce((a,b) => a+b, 0) / intervals.length;
+  const hz = clamp(1000/avgMs, .15, 28);
+  P.rate = clamp(unlog(hz, .15, 28), 0, 1);
+  refresh();
+});
+
 /* ---------------- presets ---------------- */
+// pitch/rate/depth below are solved (not guessed) from real target
+// frequencies and cycle times using this file's own HZ()/RATE()/CENTS()
+// mappings, so each preset actually lands on the numbers in the comment.
 const PRESETS = {
-  // Slow triangle wail between a deep and a piercing tone, buzzy sawtooth
-  // motor timbre — the classic air-raid siren.
-  airraid:{pitch:.51,rate:.03,depth:.29,spread:.05,dtime:.40,fback:.50,tone:.40,send:.55,wave:"sawtooth",shape:"triangle"},
-  // Clean sine tone snapping between two pitches a fifth apart — the
-  // European two-tone "nee-naw" siren, kept dry so it stays crisp.
-  police: {pitch:.70,rate:.30,depth:.08,spread:.02,dtime:.25,fback:.35,tone:.65,send:.35,wave:"sine",shape:"square"},
-  // High, fast rising ramps that snap back down — sci-fi blaster zaps —
-  // with a short, bright, cascading echo for the repeated "pew-pew".
-  laser:  {pitch:.84,rate:.63,depth:.57,spread:.15,dtime:.15,fback:.65,tone:.80,send:.75,wave:"square",shape:"sawtooth"},
-  // Slow sine wobble with wide oscillator detune for an unstable,
-  // beating shimmer — a hovering, otherworldly hum.
-  ufo:    {pitch:.59,rate:.25,depth:.24,spread:.25,dtime:.55,fback:.60,tone:.50,send:.70,wave:"triangle",shape:"sine"},
-  // Fast rising sawtooth ramps from a low base — the repeated
-  // "whoop-whoop" rising alarm.
-  whoop:  {pitch:.40,rate:.44,depth:.62,spread:.06,dtime:.40,fback:.55,tone:.50,send:.60,wave:"sine",shape:"sawtooth"},
-  // Low, buzzy square tone stepping between two pitches on a rhythmic
-  // rate, drowned in a heavy, dark dub delay throw.
-  steppa: {pitch:.34,rate:.54,depth:.17,spread:.10,dtime:.45,fback:.85,tone:.30,send:.85,wave:"square",shape:"square"}
+  // Wails smoothly between 150 Hz and 450 Hz over a slow ~6s cycle, buzzy
+  // sawtooth motor timbre — the classic air-raid siren.
+  airraid:{pitch:.48,rate:.02,depth:.23,spread:.05,dtime:.40,fback:.50,tone:.40,send:.55,wave:"sawtooth",shape:"triangle"},
+  // Clean sine tone snapping between 520 Hz and 720 Hz roughly twice a
+  // second — the European two-tone "nee-naw" siren, kept dry to stay crisp.
+  police: {pitch:.71,rate:.35,depth:.07,spread:.02,dtime:.25,fback:.35,tone:.65,send:.35,wave:"sine",shape:"square"},
+  // Fast ramps from 500 Hz up to 1400 Hz that snap back down about 4-5
+  // times a second — sci-fi blaster zaps — with a short, bright, cascading
+  // echo for the repeated "pew-pew".
+  laser:  {pitch:.79,rate:.65,depth:.21,spread:.15,dtime:.15,fback:.65,tone:.80,send:.75,wave:"square",shape:"sawtooth"},
+  // Slow sine wobble between 300 Hz and 480 Hz (~2.6s cycle) with wide
+  // oscillator detune for an unstable, beating shimmer — a hovering,
+  // otherworldly hum.
+  ufo:    {pitch:.58,rate:.18,depth:.10,spread:.25,dtime:.55,fback:.60,tone:.50,send:.70,wave:"triangle",shape:"sine"},
+  // Rising sawtooth ramp from 150 Hz to 620 Hz repeated a bit faster than
+  // once a second — the classic "whoop-whoop" rising alarm.
+  whoop:  {pitch:.52,rate:.39,depth:.29,spread:.06,dtime:.40,fback:.55,tone:.50,send:.60,wave:"sine",shape:"sawtooth"},
+  // Low, buzzy square tone stepping between 120 Hz and 190 Hz roughly
+  // every half second, drowned in a heavy, dark dub delay throw.
+  steppa: {pitch:.33,rate:.38,depth:.10,spread:.10,dtime:.45,fback:.85,tone:.30,send:.85,wave:"square",shape:"square"}
 };
 el("presets").addEventListener("click", e => {
   const b = e.target.closest(".preset"); if (!b) return;
@@ -283,22 +301,14 @@ const shapeFn = {
   sine:   p => Math.sin(2*Math.PI*p),
   triangle:p => 2*Math.abs(2*(p%1)-1)-1,
   sawtooth:p => 2*(p%1)-1,
-  square: p => ((p%1) < .5 ? 1 : -1),
-  random: () => randVal
+  square: p => ((p%1) < .5 ? 1 : -1)
 };
 const trace = new Array(180).fill(0);
 
 function draw(now){
   requestAnimationFrame(draw);
   const t = now/1000;
-
-  // sample & hold for the random sweep
   const r = RATE();
-  if (t - randLast >= 1/r){
-    randLast = t; randVal = Math.random()*2 - 1;
-    if (ready) lfoRand.offset.setTargetAtTime(randVal, ctx.currentTime, .004);
-  }
-
   const phase = (t*r) % 1;
   const v = (shapeFn[P.shape] || shapeFn.sine)(phase);
   const cents = v * CENTS();

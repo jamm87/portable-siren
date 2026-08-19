@@ -126,5 +126,6 @@ Neither is set up yet.
 - **Stop** cuts the siren immediately — but only the dry tone. If there's echo/feedback going, the delay trail keeps ringing out on its own instead of being chopped off dead.
 - **Feedback** drives the echo feedback to maximum while held.
 - **SIREN** controls (waveform, sweep shape, pitch, rate, depth, spread), **ECHO** (time, repeats, tone, send), and **OUT** (volume).
+- **TAP**, next to the RATE slider: tap it a few times at the pace you want and RATE snaps to match (averages your last few taps; pause more than 2s and it starts fresh).
 - The status line at the bottom shows the audio engine state and sample rate, plus a **TEST TONE** button to confirm sound is working.
-- Quick presets: AIR RAID, POLICE, LASER, UFO, WHOOP, STEPPA — each tuned to a distinct character (see the comments above the `PRESETS` object in `www/app.js` for the sound-design reasoning behind each one). If one doesn't quite land for you, the sliders show exactly what values it set, so you can nudge it from there.
+- Quick presets: AIR RAID, POLICE, LASER, UFO, WHOOP, STEPPA. Each one is solved from real target frequencies and cycle times, not eyeballed — e.g. AIR RAID actually sweeps 150→450 Hz over a 6s wail, POLICE alternates 520↔720 Hz about twice a second. See the comments above the `PRESETS` object in `www/app.js` for the exact numbers behind every preset. If one still doesn't land for you, the sliders show exactly what values it set, so you can nudge it from there.
