@@ -306,8 +306,7 @@ function draw(now){
 
   led.classList.toggle("on", playing && phase < .5);
 
-  /* --- scope: live pitch trace --- */
-  trace.push(f); if (trace.length > 180) trace.shift();
+  /* --- scope: live pitch trace, flat when silent --- */
   sctx.clearRect(0,0,scopeW,scopeH);
   sctx.fillStyle = "#060A07"; sctx.fillRect(0,0,scopeW,scopeH);
   sctx.strokeStyle = "rgba(201,162,39,.10)"; sctx.lineWidth = 1;
@@ -315,16 +314,22 @@ function draw(now){
     const y = scopeH*i/4; sctx.beginPath();
     sctx.moveTo(0,y+.5); sctx.lineTo(scopeW,y+.5); sctx.stroke();
   }
-  sctx.beginPath();
-  for (let i=0;i<trace.length;i++){
-    const x = i/(trace.length-1)*scopeW;
-    const y = scopeH - clamp(unlog(clamp(trace[i],40,9000),40,9000),0,1)*(scopeH-8) - 4;
-    i ? sctx.lineTo(x,y) : sctx.moveTo(x,y);
+  if (playing){
+    trace.push(f); if (trace.length > 180) trace.shift();
+    sctx.beginPath();
+    for (let i=0;i<trace.length;i++){
+      const x = i/(trace.length-1)*scopeW;
+      const y = scopeH - clamp(unlog(clamp(trace[i],40,9000),40,9000),0,1)*(scopeH-8) - 4;
+      i ? sctx.lineTo(x,y) : sctx.moveTo(x,y);
+    }
+    sctx.strokeStyle = "#C9A227"; sctx.lineWidth = 1.6; sctx.lineJoin = "round";
+    sctx.shadowColor = "rgba(201,162,39,.85)"; sctx.shadowBlur = 7;
+    sctx.stroke(); sctx.shadowBlur = 0;
+  } else {
+    trace.fill(f);   // keep the buffer primed so the trace doesn't jump when sound resumes
+    sctx.strokeStyle = "#2E3F30"; sctx.lineWidth = 1.6;
+    sctx.beginPath(); sctx.moveTo(0,scopeH/2+.5); sctx.lineTo(scopeW,scopeH/2+.5); sctx.stroke();
   }
-  sctx.strokeStyle = playing ? "#C9A227" : "#2E3F30";
-  sctx.lineWidth = 1.6; sctx.lineJoin = "round";
-  if (playing){ sctx.shadowColor = "rgba(201,162,39,.85)"; sctx.shadowBlur = 7; }
-  sctx.stroke(); sctx.shadowBlur = 0;
 
   /* --- plate --- */
   pctx.clearRect(0,0,plateW,plateH);
