@@ -27,12 +27,18 @@ body{
   padding:
     calc(env(safe-area-inset-top) + 10px)
     calc(env(safe-area-inset-right) + 10px)
-    calc(env(safe-area-inset-bottom) + 16px)
+    calc(env(safe-area-inset-bottom) + 10px)
     calc(env(safe-area-inset-left) + 10px);
   max-width:620px;margin:0 auto;
+  height:100vh;height:100dvh;
+  display:flex;flex-direction:column;
+  overflow:hidden;
 }
 
 /* ---------- chassis ---------- */
+/* The chassis is a fixed-height flex column: .perf (scope/plate/transport)
+   never scrolls, .config scrolls on its own below it — so the oscilloscope
+   and touch plate stay reachable without hunting through the page. */
 .chassis{
   background:
     radial-gradient(120% 80% at 50% 0%, var(--enamel-hi), var(--enamel) 55%, #16281F 100%);
@@ -43,7 +49,19 @@ body{
     inset 0 1px 0 rgba(255,255,255,.10),
     inset 0 -2px 0 rgba(0,0,0,.5),
     0 12px 30px rgba(0,0,0,.7);
+  flex:1 1 auto;min-height:0;
+  display:flex;flex-direction:column;
+  overflow:hidden;
 }
+
+.perf{flex:0 0 auto}
+
+.config{
+  flex:1 1 auto;min-height:0;
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+
 /* screen-print grain */
 .chassis::after{
   content:"";position:absolute;inset:0;border-radius:14px;pointer-events:none;
@@ -108,6 +126,11 @@ h1{
 }
 .rule::after{content:"";flex:1;height:1px;background:rgba(0,0,0,.45);
   box-shadow:0 1px 0 rgba(255,255,255,.06)}
+.rule-hint{
+  order:2;flex:0 0 auto;text-transform:none;letter-spacing:.02em;
+  font-size:9px;color:#5D6E60;
+}
+.rule-hint::before{content:none}
 
 .ctrl{display:flex;align-items:center;gap:10px;margin:2px 0}
 .ctrl label{
@@ -188,6 +211,10 @@ input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--cr
 }
 .preset:active{background:linear-gradient(#E5CE7E,#C9A227);color:var(--ink)}
 
+.mem-btn{color:var(--cream-dim)}
+.mem-btn.filled{color:var(--brass);border-color:rgba(201,162,39,.45)}
+.mem-btn.saved{background:linear-gradient(#E5CE7E,#C9A227);color:var(--ink)}
+
 footer{
   font-family:var(--mono);font-size:10px;line-height:1.6;color:#5D6E60;
   padding:14px 6px 0;text-align:center;
@@ -226,4 +253,21 @@ footer b{color:#8B9A83;font-weight:400}
 
 @media (prefers-reduced-motion:reduce){
   .led.on{box-shadow:0 0 6px 1px rgba(201,162,39,.6)}
+}
+
+/* ---------- landscape: perf pane pinned left, config scrolls on the right ----------
+   Placed last so it wins the cascade over the plain component rules above
+   (header/.scope/.plate/.btnrow) at equal specificity. Lets a finger stay on
+   the plate while the other hand works the sliders. */
+@media (orientation:landscape){
+  body{max-width:none}
+  .chassis{flex-direction:row;gap:16px}
+  .perf{
+    flex:0 0 50%;max-width:50%;min-height:0;
+    display:flex;flex-direction:column;
+  }
+  header,.scope,.btnrow{flex:0 0 auto}
+  .plate-wrap{flex:1 1 auto;min-height:0}
+  .plate{height:100%;min-height:60px}
+  .config{flex:1 1 50%}
 }

@@ -27,27 +27,31 @@
   <i class="screw tl"></i><i class="screw tr"></i>
   <i class="screw bl"></i><i class="screw br"></i>
 
-  <header>
-    <h1>Dub Siren</h1>
-    <span class="led" id="led"></span>
-    <span class="model">MK-1</span>
-  </header>
+  <div class="perf">
+    <header>
+      <h1>Dub Siren</h1>
+      <span class="led" id="led"></span>
+      <span class="model">MK-1</span>
+    </header>
 
-  <canvas class="scope" id="scope" aria-hidden="true"></canvas>
+    <canvas class="scope" id="scope" aria-hidden="true"></canvas>
 
-  <div class="plate-wrap">
-    <canvas class="plate" id="plate" role="application"
-      aria-label="Touch plate: horizontal changes pitch, vertical changes sweep rate. Hold down to sound."></canvas>
-    <span class="plate-tag">◀ PITCH ▶</span>
-    <span class="plate-tag right">▲ RATE ▼</span>
+    <div class="plate-wrap">
+      <canvas class="plate" id="plate" role="application"
+        aria-label="Touch plate: horizontal changes pitch, vertical changes sweep rate. Hold down to sound."></canvas>
+      <span class="plate-tag">◀ PITCH ▶</span>
+      <span class="plate-tag right">▲ RATE ▼</span>
+    </div>
+
+    <div class="btnrow">
+      <button class="btn latch" id="latch" aria-pressed="false">Latch</button>
+      <button class="btn" id="stop">Stop</button>
+      <button class="btn" id="tap" type="button">Tap</button>
+      <button class="btn blood" id="blast">Feedback</button>
+    </div>
   </div>
 
-  <div class="btnrow">
-    <button class="btn latch" id="latch" aria-pressed="false">Latch</button>
-    <button class="btn" id="stop">Stop</button>
-    <button class="btn" id="tap" type="button">Tap</button>
-    <button class="btn blood" id="blast">Feedback</button>
-  </div>
+  <div class="config">
 
   <div class="rule">SIREN</div>
 
@@ -132,17 +136,27 @@
     <button class="preset" data-p="steppa">STEPPA</button>
   </div>
 
+  <div class="rule">MEM<span class="rule-hint">hold to save, tap to load</span></div>
+
+  <div class="presets" id="mem">
+    <button class="preset mem-btn" data-slot="0">— 1 —</button>
+    <button class="preset mem-btn" data-slot="1">— 2 —</button>
+    <button class="preset mem-btn" data-slot="2">— 3 —</button>
+  </div>
+
   <div class="status">
     AUDIO: <b id="stat">standby</b>
     <button id="test">TEST TONE</button>
   </div>
-</div>
 
-<footer>
-  Keep your finger on the plate to sound it. <b>Latch</b> lets it keep sounding on its own —
-  tap <b>Stop</b> to cut it, echo tail included.<br>
-  If you hear nothing, turn off silent mode on your phone and turn up the volume.
-</footer>
+  <footer>
+    Keep your finger on the plate to sound it. <b>Latch</b> lets it keep sounding on its own —
+    tap <b>Stop</b> to cut it, echo tail included.<br>
+    If you hear nothing, turn off silent mode on your phone and turn up the volume.
+  </footer>
+
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>

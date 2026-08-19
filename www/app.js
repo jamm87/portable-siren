@@ -260,6 +260,48 @@ el("presets").addEventListener("click", e => {
   build(); setWave(P.wave); setShape(P.shape); syncChips(); refresh();
 });
 
+/* ---------------- mem: 3 user-savable slots (hold to save, tap to load) ---------------- */
+const MEM_KEY = "dubsiren-mem-v1", MEM_HOLD_MS = 600;
+let memSlots;
+try { memSlots = JSON.parse(localStorage.getItem(MEM_KEY)); } catch(e){ memSlots = null; }
+if (!Array.isArray(memSlots) || memSlots.length !== 3) memSlots = [null,null,null];
+
+const memBtns = [...el("mem").children];
+function renderMem(){
+  memBtns.forEach((b,i) => {
+    const filled = !!memSlots[i];
+    b.classList.toggle("filled", filled);
+    b.textContent = filled ? "MEM " + (i+1) : "— " + (i+1) + " —";
+  });
+}
+renderMem();
+
+memBtns.forEach((b,i) => {
+  let holdTimer = null, saved = false;
+  b.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    saved = false;
+    holdTimer = setTimeout(() => {
+      saved = true;
+      memSlots[i] = { ...P };
+      try { localStorage.setItem(MEM_KEY, JSON.stringify(memSlots)); } catch(e){}
+      renderMem();
+      b.classList.add("saved");
+      setTimeout(() => b.classList.remove("saved"), 250);
+    }, MEM_HOLD_MS);
+  });
+  const cancel = () => clearTimeout(holdTimer);
+  b.addEventListener("pointerup", e => {
+    clearTimeout(holdTimer);
+    if (saved) return;
+    const slot = memSlots[i]; if (!slot) return;
+    Object.assign(P, slot);
+    build(); setWave(P.wave); setShape(P.shape); syncChips(); refresh();
+  });
+  b.addEventListener("pointercancel", cancel);
+  b.addEventListener("pointerleave", cancel);
+});
+
 /* ---------------- touch plate ---------------- */
 const plate = el("plate"), pctx = plate.getContext("2d");
 const scope = el("scope"), sctx = scope.getContext("2d");
