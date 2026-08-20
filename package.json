@@ -1,7 +1,7 @@
 {
   "name": "portable-siren",
   "version": "1.0.0",
-  "description": "Dub Siren MK-1 — a dub siren synthesizer (Web Audio) shipped as a PWA, an Android app and an iOS app via Capacitor.",
+  "description": "Portable Dub Siren — a dub siren synthesizer (Web Audio) shipped as a PWA, an Android app and an iOS app via Capacitor.",
   "private": true,
   "scripts": {
     "sync": "cap sync",

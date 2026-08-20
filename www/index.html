@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dub Siren">
 <meta name="theme-color" content="#101B15">
-<title>Dub Siren MK-1</title>
+<title>Portable Dub Siren</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-180.png">
@@ -17,6 +17,7 @@
 <body>
 
 <div class="power" id="power">
+  <p class="kicker">Portable</p>
   <h2>Dub Siren</h2>
   <button id="powerBtn">Power On</button>
   <p>iOS needs a tap to open audio.<br>
@@ -29,7 +30,10 @@
 
   <div class="perf">
     <header>
-      <h1>Dub Siren</h1>
+      <div class="brand">
+        <p class="kicker">Portable</p>
+        <h1>Dub Siren</h1>
+      </div>
       <span class="led" id="led"></span>
       <span class="model">MK-1</span>
     </header>
@@ -172,13 +176,21 @@
 
   <div class="status">
     AUDIO: <b id="stat">standby</b>
+    <div class="fb-wrap">
+      <button id="feedbackBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Send feedback">✉</button>
+      <div class="fb-menu" id="feedbackMenu" hidden>
+        <a href="https://github.com/jamm87/portable-siren/issues/new" target="_blank" rel="noopener">Report on GitHub ↗</a>
+        <a href="mailto:PortableDubSiren@gmail.com?subject=Portable%20Dub%20Siren%20feedback">Email us ↗</a>
+      </div>
+    </div>
     <button id="test">TEST TONE</button>
   </div>
 
   <footer>
     Keep your finger on the plate to sound it. <b>Latch</b> lets it keep sounding on its own —
     tap <b>Stop</b> to cut it, echo tail included.<br>
-    If you hear nothing, turn off silent mode on your phone and turn up the volume.
+    If you hear nothing, turn off silent mode on your phone and turn up the volume.<br>
+    New here? <a href="guide.html">Read the guide</a> for what every control does.
   </footer>
 
   </div>

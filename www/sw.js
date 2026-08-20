@@ -1,10 +1,12 @@
-const CACHE = "dub-siren-v13";
+const CACHE = "dub-siren-v14";
 const ASSETS = [
   "./",
   "./index.html",
   "./style.css",
   "./app.js",
   "./manifest.json",
+  "./guide.html",
+  "./privacy.html",
   "./icons/icon-192.png",
   "./icons/icon-512.png"
 ];

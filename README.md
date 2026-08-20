@@ -1,4 +1,4 @@
-# Dub Siren MK-1
+# Portable Dub Siren
 
 A dub siren synthesizer (Web Audio API). You can install it a few ways:
 
@@ -12,6 +12,7 @@ A dub siren synthesizer (Web Audio API). You can install it a few ways:
 |---|---|
 | **Download the Android APK** | **[DubSiren.apk](https://github.com/jamm87/portable-siren/releases/download/android-latest/DubSiren.apk)** — open this link on the phone in Chrome, then install. Always the latest build from `main`. |
 | **Use it in the browser / install as PWA** | **[jamm87.github.io/portable-siren](https://jamm87.github.io/portable-siren/)** — works on any device with a modern browser; on iPhone, open in Safari and use "Add to Home Screen" (see below). |
+| **Instructions / guide** | **[jamm87.github.io/portable-siren/guide.html](https://jamm87.github.io/portable-siren/guide.html)** — what every control does, also reachable from the app itself. |
 
 ## Structure
 
@@ -23,6 +24,7 @@ www/                     web code (the app itself: HTML/CSS/JS, no dependencies)
   manifest.json          PWA manifest (icon, name, standalone mode)
   sw.js                  service worker: caches the app for offline use
   icons/                 PWA icons
+  guide.html             in-app instructions, what every control does
   privacy.html           privacy policy (required by Google Play)
 docs/PLAY_STORE.md       step-by-step guide to publishing on Google Play
 .github/workflows/pages.yml   publishes www/ to GitHub Pages on every push to main
@@ -102,8 +104,6 @@ Every time you edit `www/index.html`, `style.css`, or `app.js`:
   ```
   The APK ends up at `android/app/build/outputs/apk/debug/app-debug.apk`.
 
-
-
 ## Using the app
 
 - Tap **Power On** first — iOS (and most mobile browsers) require a tap before they'll let a page play audio. This just unlocks the audio engine, no sound plays until you touch the plate.
@@ -128,5 +128,13 @@ How the controls below are arranged is up to you — pick one of three modes wit
 - **SIREN** controls (waveform, sweep shape, pitch, rate, depth, spread), **ECHO** (time, repeats, tone, send), and **OUT** (volume).
 - Quick presets: AIR RAID, POLICE, LASER, UFO, HORN, DUB. **Hold one down and it sounds for as long as you hold it**, the same way the plate does — so presets can be played, not just picked. Let go and it stops, unless **Latch** is on, in which case it keeps running. Each one is solved from real target frequencies and cycle times, not eyeballed — e.g. AIR RAID actually sweeps 150→450 Hz over a 6s wail, POLICE alternates 520↔720 Hz about twice a second. **HORN** is a big air/ship horn: a sustained 164 Hz blast (not a sweep — the waver stays under half a semitone) with the two oscillators detuned 36 cents so they beat against each other at ~3.4 Hz, the growl of a twin-reed horn. **DUB** is the pure dub siren: a plain sine tone with no detune at all, warbling one clean octave (300→600 Hz) about once a second into a long 378 ms echo at 0.80 feedback. See the comments above the `PRESETS` object in `www/app.js` for the exact numbers behind every preset. If one still doesn't land for you, the sliders show exactly what values it set, so you can nudge it from there.
 - **Mem**: 3 slots for your own settings, separate from the built-in presets. **Hold** a Mem button (~0.6s) to save the current sound into that slot — it flashes gold and switches from "— 1 —" to "MEM 1" to show it's filled. **Tap** a filled slot to instantly recall it. Saved slots persist on the device (localStorage), so they survive closing the app.
-- The status line at the bottom shows the audio engine state and sample rate, plus a **TEST TONE** button to confirm sound is working.
+- The status line at the bottom shows the audio engine state and sample rate, plus a **TEST TONE** button to confirm sound is working, and a small ✉ button for sending feedback (opens a choice of GitHub or email — see below).
+- New to the app? The footer links to the **[guide](https://jamm87.github.io/portable-siren/guide.html)** (source: `www/guide.html`), a page explaining every control section by section.
 - Leaving the app — switching apps, locking the screen, or closing the tab — silences the siren and the echo tail with it, and suspends the audio engine. Coming back restores everything ready to play.
+
+## Feedback
+
+Two ways in, both reachable from the small ✉ button on the app's status line (or the [guide](https://jamm87.github.io/portable-siren/guide.html#feedback) page):
+
+- **GitHub**: [open an issue](https://github.com/jamm87/portable-siren/issues/new)
+- **Email**: [PortableDubSiren@gmail.com](mailto:PortableDubSiren@gmail.com)

@@ -113,6 +113,11 @@ body{
 
 /* ---------- header ---------- */
 header{display:flex;align-items:baseline;gap:8px;padding:0 12px 10px;}
+.brand{display:flex;flex-direction:column;gap:1px;min-width:0}
+.kicker{
+  font-family:var(--mono);font-size:8px;font-weight:400;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--brass);margin:0;
+}
 h1{
   font-size:23px;font-weight:700;letter-spacing:.30em;margin:0;
   text-transform:uppercase;text-shadow:var(--engrave);
@@ -292,6 +297,7 @@ footer{
   padding:14px 6px 0;text-align:center;
 }
 footer b{color:#8B9A83;font-weight:400}
+footer a{color:var(--brass);text-decoration:none}
 
 /* ---------- power-on + diagnostics ---------- */
 .power{
@@ -300,8 +306,9 @@ footer b{color:#8B9A83;font-weight:400}
   gap:20px;padding:26px;text-align:center;
 }
 .power.hide{display:none}
+.power .kicker{font-size:9px;text-align:center;margin-bottom:-8px}
 .power h2{font-size:20px;letter-spacing:.28em;text-transform:uppercase;margin:0}
-.power p{
+.power p:not(.kicker){
   font-family:var(--mono);font-size:11px;line-height:1.7;
   color:var(--cream-dim);max-width:300px;margin:0;
 }
@@ -322,6 +329,31 @@ footer b{color:#8B9A83;font-weight:400}
   color:var(--cream);background:linear-gradient(#22392C,#16261D);
   border:1px solid rgba(0,0,0,.5);border-radius:4px;padding:9px 12px;
 }
+
+/* feedback: a small icon button so it doesn't compete with TEST TONE for
+   space, opening a tiny popover with the two ways to actually send it */
+.fb-wrap{position:relative;margin-left:auto;display:flex}
+.status #test{margin-left:0}   /* .fb-wrap already claims the row's free space */
+#feedbackBtn{
+  width:30px;height:30px;padding:0;font-size:13px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--cream);background:linear-gradient(#22392C,#16261D);
+  border:1px solid rgba(0,0,0,.5);border-radius:4px;
+}
+#feedbackBtn[aria-expanded=true]{color:var(--brass);border-color:rgba(201,162,39,.5)}
+.fb-menu{
+  position:absolute;right:0;bottom:calc(100% + 8px);z-index:5;
+  min-width:150px;padding:6px;display:flex;flex-direction:column;gap:2px;
+  background:linear-gradient(#22392C,#16261D);
+  border:1px solid rgba(0,0,0,.5);border-radius:6px;
+  box-shadow:0 8px 20px rgba(0,0,0,.55);
+}
+.fb-menu[hidden]{display:none}
+.fb-menu a{
+  font-family:var(--mono);font-size:10px;letter-spacing:.03em;
+  color:var(--cream);text-decoration:none;border-radius:4px;padding:8px 9px;
+}
+.fb-menu a:hover,.fb-menu a:active{background:rgba(201,162,39,.15);color:var(--brass)}
 
 @media (prefers-reduced-motion:reduce){
   .led.on{box-shadow:0 0 6px 1px rgba(201,162,39,.6)}

@@ -1,4 +1,4 @@
-# Publishing Dub Siren on Google Play
+# Publishing Portable Dub Siren on Google Play
 
 Step by step, from nothing to a live listing. Budget roughly **$25 once** (the
 Play Console registration fee) and **a few days to two weeks** of waiting for
@@ -45,7 +45,7 @@ forever once you upload, change it *now* if you ever want a different name.
 
 In Play Console → **Create app**:
 
-- **App name**: `Dub Siren` (up to 30 characters)
+- **App name**: `Portable Dub Siren` (up to 30 characters)
 - **Default language**: your choice
 - **App or game**: App
 - **Free or paid**: Free (you can't switch a free app to paid later)

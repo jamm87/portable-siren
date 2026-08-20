@@ -569,6 +569,22 @@ el("test").addEventListener("click", () => {
   o.stop(t + 1.2);
 });
 
+/* ---------------- feedback popover ---------------- */
+const feedbackBtn = el("feedbackBtn"), feedbackMenu = el("feedbackMenu");
+function closeFeedback(){
+  feedbackMenu.hidden = true;
+  feedbackBtn.setAttribute("aria-expanded", "false");
+}
+feedbackBtn.addEventListener("click", e => {
+  e.stopPropagation();
+  const opening = feedbackMenu.hidden;
+  feedbackMenu.hidden = !opening;
+  feedbackBtn.setAttribute("aria-expanded", String(opening));
+});
+feedbackMenu.addEventListener("click", e => { if (e.target.closest("a")) closeFeedback(); });
+document.addEventListener("click", e => { if (!e.target.closest(".fb-wrap")) closeFeedback(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeFeedback(); });
+
 /* ---------------- leaving / returning to the app ---------------- */
 // Applies everywhere — native app, installed PWA and plain browser tab alike.
 // Switching apps, locking the screen or closing the tab silences the siren and
