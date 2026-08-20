@@ -9,7 +9,9 @@ const unlog = (v,a,b) => Math.log(v/a)/Math.log(b/a);
 
 const P = {                       // normalized 0..1 values
   pitch:.42, rate:.33, depth:.48, spread:.09,
-  dtime:.42, fback:.62, tone:.52, send:.70, vol:.70,
+  // fback .75 leaves a ~5.8s echo tail once the pad is released (measured to
+  // -60dB at the default 149ms delay); .62 died away in 2.8s, too short for dub.
+  dtime:.42, fback:.75, tone:.52, send:.70, vol:.70,
   wave:"sine", shape:"sine"
 };
 const HZ    = () => logMap(P.pitch, 45, 1800);
