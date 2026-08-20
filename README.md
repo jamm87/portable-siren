@@ -90,18 +90,6 @@ open ios/App/App.xcodeproj
 
 Capacitor 8 uses Swift Package Manager instead of CocoaPods, so there's no need for `pod install`: just open `App.xcodeproj` (there's no `.xcworkspace`) and Xcode resolves the dependencies on its own.
 
-## Running it on your iPhone 12 mini
-
-1. Connect the iPhone to the Mac via cable (or enable it over the network: Xcode → Window → Devices and Simulators → your iPhone → "Connect via network").
-2. In Xcode, select the **App** target and, at the top, choose your iPhone as the destination (instead of the simulator).
-3. **Signing & Capabilities** tab of the App target:
-   - Check "Automatically manage signing".
-   - Under "Team" pick your personal Apple ID (if it's not listed, add it in Xcode → Settings → Accounts). Xcode will create a free "Personal Team".
-4. Press ▶️ Run. Xcode builds, installs, and launches the app on the iPhone.
-5. **The first time, the iPhone will block the app** for not being from a trusted developer: go to Settings → General → VPN & Device Management → tap your developer Apple ID → Trust. Launch it again from the home screen or from Xcode.
-
-Note: free signing profiles expire after 7 days; after that you'll need to build/install again from Xcode (nothing is lost, it's just a limitation of free signing versus paid signing).
-
 ## After changing something in `www/`
 
 Every time you edit `www/index.html`, `style.css`, or `app.js`:
