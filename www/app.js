@@ -307,12 +307,32 @@ const PRESETS = {
   // feedback dub echo — the King Tubby-style "siren pon the riddim".
   dub: {pitch:.61,rate:.39,depth:.29,spread:0,dtime:.69,fback:.87,tone:.56,send:.62,wave:"sine",shape:"sine"}
 };
-el("presets").addEventListener("click", e => {
+// Press and hold a preset to load it and sound it for as long as it's held —
+// same gesture as the plate, so presets can be played rather than just picked.
+// Latch still wins: with it on, letting go leaves the siren running.
+const presetsBox = el("presets");
+let presetPointer = null;
+
+presetsBox.addEventListener("pointerdown", e => {
   const b = e.target.closest(".preset"); if (!b) return;
   const p = PRESETS[b.dataset.p]; if (!p) return;
+  e.preventDefault();
+  presetPointer = e.pointerId;
+  try { b.setPointerCapture(e.pointerId); } catch(err){}
+  b.classList.add("held");   // preventDefault above suppresses :active on touch
   Object.assign(P, p);
   build(); setWave(P.wave); setShape(P.shape); syncChips(); refresh();
+  on();
 });
+
+const presetRelease = e => {
+  if (e.pointerId !== presetPointer) return;
+  presetPointer = null;
+  [...presetsBox.children].forEach(c => c.classList.remove("held"));
+  if (!latch) off();
+};
+presetsBox.addEventListener("pointerup", presetRelease);
+presetsBox.addEventListener("pointercancel", presetRelease);
 
 /* ---------------- mem: 3 user-savable slots (hold to save, tap to load) ---------------- */
 const MEM_KEY = "dubsiren-mem-v1", MEM_HOLD_MS = 600;

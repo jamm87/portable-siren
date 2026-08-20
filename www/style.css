@@ -243,7 +243,10 @@ input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--cr
   font-family:var(--mono);font-size:10px;letter-spacing:.12em;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
 }
-.preset:active{background:linear-gradient(#E5CE7E,#C9A227);color:var(--ink)}
+.preset:active,.preset.held{background:linear-gradient(#E5CE7E,#C9A227);color:var(--ink)}
+/* presets are played by holding them, so the scroll container mustn't take
+   the gesture — the surrounding rows are still free to scroll from */
+#presets .preset{touch-action:none}
 
 .mem-btn{color:var(--cream-dim)}
 .mem-btn.filled{color:var(--brass);border-color:rgba(201,162,39,.45)}
