@@ -16,13 +16,23 @@ def signingKeyPass   = keystoreProps['keyPassword'] ?: System.getenv('ANDROID_KE
 def hasSigning = signingStorePath && file(signingStorePath).exists() &&
                  signingStorePass && signingKeyAlias && signingKeyPass
 
+// Resolved out here on purpose. Written inline as `versionCode (expr).toX()`,
+// Groovy reads the space before the bracket as a call to the DSL setter and
+// then chains onto its return value, which is null.
+// Overridable from CI: -PversionCode=5 -PversionName=1.1. Play rejects an
+// upload whose versionCode isn't higher than the previous one.
+def appVersionCode = (project.findProperty("versionCode") ?: "1").toString().toInteger()
+def appVersionName = (project.findProperty("versionName") ?: "1.0").toString()
+
 android {
     namespace = "com.jamm87.dubsiren"
     compileSdk = rootProject.ext.compileSdkVersion
 
     signingConfigs {
-        release {
-            if (hasSigning) {
+        // Only declared when the material is actually there, so an unsigned
+        // build has no half-populated config lying around.
+        if (hasSigning) {
+            release {
                 storeFile file(signingStorePath)
                 storePassword signingStorePass
                 keyAlias signingKeyAlias
@@ -35,10 +45,8 @@ android {
         applicationId "com.jamm87.dubsiren"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        // Overridable from CI: -PversionCode=5 -PversionName=1.1
-        // Play rejects an upload whose versionCode isn't higher than the last.
-        versionCode (project.findProperty("versionCode") ?: "1").toString().toInteger()
-        versionName (project.findProperty("versionName") ?: "1.0").toString()
+        versionCode appVersionCode
+        versionName appVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
