@@ -33,9 +33,20 @@ function statusAuto(){
 }
 window.addEventListener("error", e => status("error: " + (e.message || "?")));
 
+// Saturator curve for the echo feedback loop. Two properties matter, because
+// this sits *inside* a feedback path:
+//   1. Odd-symmetric, so input 0 maps to exactly 0. (Spanning i/(n-1) instead
+//      of i/n is what guarantees it: with an even n the interpolated sample at
+//      zero input lands between two mirrored values that cancel. The old
+//      i*2/n-1 spacing left a -1.6e-3 DC offset that seeded the loop forever.)
+//   2. Slope 1 at the origin, so small signals pass at unity instead of being
+//      amplified — dividing by DRIVE normalizes it. Without this the loop gain
+//      was 1.66 x feedback and the delay self-oscillated around 200 Hz on its
+//      own, with nothing played.
+const DRIVE = 1.8;
 function shaperCurve(){
   const n = 1024, c = new Float32Array(n);
-  for (let i=0;i<n;i++){ const x = i*2/n - 1; c[i] = Math.tanh(x*1.8)*.92; }
+  for (let i=0;i<n;i++){ const x = (i/(n-1))*2 - 1; c[i] = Math.tanh(x*DRIVE)/DRIVE; }
   return c;
 }
 
@@ -75,7 +86,9 @@ function build(){
   fbGain = ctx.createGain(); fbGain.gain.value = FB();
   fbFilt = ctx.createBiquadFilter(); fbFilt.type = "lowpass";
   fbFilt.frequency.value = TONE(); fbFilt.Q.value = .7;
-  hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 170;
+  // Q pinned to Butterworth: the default Q=1 puts a resonant bump right above
+  // the corner, which is extra loop gain exactly where the delay wants to ring.
+  hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 170; hp.Q.value = .707;
   sat = ctx.createWaveShaper(); sat.curve = shaperCurve(); sat.oversample = "2x";
   echoOut = ctx.createGain(); echoOut.gain.value = .95;
 
@@ -113,6 +126,45 @@ function off(){
   playing = false;
 }
 
+/* --- leaving the app: kill everything, echo tail included --- */
+// Unlike off(), this also shuts the delay path so nothing keeps ringing in the
+// background. asleep stays true until wake() has drained the delay line, and
+// apply() leaves the echo gains alone while it's set.
+let asleep = false;
+
+function hardStop(){
+  latch = false;
+  latchBtn.setAttribute("aria-pressed", "false");
+  blast = false;
+  playing = false;
+  if (!ready) return;
+  const t = ctx.currentTime;
+  [voice.gain, fbGain.gain, echoOut.gain].forEach(g => {
+    g.cancelScheduledValues(t);
+    g.value = 0;   // set outright, not scheduled: suspend() below can land first
+  });
+  asleep = true;
+  if (ctx.state === "running") ctx.suspend().then(statusAuto, statusAuto);
+}
+
+function wake(){
+  if (!ready || !asleep) return;
+  const restore = () => {
+    asleep = false;
+    // Hold the echo silent for one delay period first: with feedback at 0 that
+    // empties whatever was still sitting in the delay line, so the tail from
+    // before can't reappear when coming back.
+    const t = ctx.currentTime, drain = DTIME() + .05;
+    echoOut.gain.setValueAtTime(0, t);
+    echoOut.gain.setValueAtTime(.95, t + drain);
+    fbGain.gain.setValueAtTime(0, t);
+    fbGain.gain.setValueAtTime(FB(), t + drain);
+    statusAuto();
+  };
+  if (ctx.state !== "running") ctx.resume().then(restore, statusAuto);
+  else restore();
+}
+
 function apply(){
   if (!ready) return;
   const t = ctx.currentTime;
@@ -122,10 +174,10 @@ function apply(){
   lfo.frequency.setTargetAtTime(RATE(), t, .02);
   lfoAmt.gain.setTargetAtTime(CENTS(), t, .02);
   delay.delayTime.setTargetAtTime(DTIME(), t, .09);   // tape-style glide
-  fbGain.gain.setTargetAtTime(blast ? .99 : FB(), t, .03);
   fbFilt.frequency.setTargetAtTime(TONE(), t, .03);
   send.gain.setTargetAtTime(P.send, t, .03);
   master.gain.setTargetAtTime(P.vol, t, .03);
+  if (!asleep) fbGain.gain.setTargetAtTime(blast ? .99 : FB(), t, .03);
 }
 
 function setWave(w){
@@ -426,6 +478,36 @@ function draw(now){
 resize();
 requestAnimationFrame(draw);
 
+/* ---------------- layout modes ---------------- */
+// Runs after the canvases exist, since switching layout resizes them.
+const LAY_KEY = "dubsiren-layout-v1";
+const layBtns = [...el("layouts").children];
+const tabBtns = [...el("tabs").children];
+const panes = [...document.querySelectorAll(".pane")];
+
+function setLayout(n){
+  document.body.dataset.layout = n;
+  layBtns.forEach(b => b.setAttribute("aria-pressed", b.dataset.layout === n));
+  try { localStorage.setItem(LAY_KEY, n); } catch(e){}
+  resize();   // the plate and scope changed size, re-fit the canvases
+}
+function setTab(name){
+  panes.forEach(p => p.classList.toggle("active", p.dataset.pane === name));
+  tabBtns.forEach(b => b.setAttribute("aria-pressed", b.dataset.tab === name));
+}
+el("layouts").addEventListener("click", e => {
+  const b = e.target.closest(".lay-btn"); if (b) setLayout(b.dataset.layout);
+});
+el("tabs").addEventListener("click", e => {
+  const b = e.target.closest(".tab"); if (b) setTab(b.dataset.tab);
+});
+
+let savedLayout = "1";
+try { savedLayout = localStorage.getItem(LAY_KEY) || "1"; } catch(e){}
+if (!["1","2","3"].includes(savedLayout)) savedLayout = "1";
+setTab("siren");
+setLayout(savedLayout);
+
 /* ---------------- power-on and test tone ---------------- */
 el("powerBtn").addEventListener("click", () => {
   ensure();
@@ -446,34 +528,28 @@ el("test").addEventListener("click", () => {
   o.stop(t + 1.2);
 });
 
+/* ---------------- leaving / returning to the app ---------------- */
+// Applies everywhere — native app, installed PWA and plain browser tab alike.
+// Switching apps, locking the screen or closing the tab silences the siren and
+// the echo tail with it.
 document.addEventListener("visibilitychange", () => {
-  if (!document.hidden && ctx && ctx.state !== "running"){
-    ctx.resume().then(statusAuto, statusAuto);
-  }
+  if (document.hidden) hardStop(); else wake();
 });
+window.addEventListener("pagehide", hardStop);
 
 document.addEventListener("gesturestart", e => e.preventDefault());
 
 /* ---------------- native app integration (Capacitor: iOS + Android) ---------------- */
 if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()){
-  const stopForBackground = () => {
-    latch = false;
-    latchBtn.setAttribute("aria-pressed","false");
-    off();
-    if (ctx && ctx.state === "running") ctx.suspend();
-  };
-
   const CapApp = window.Capacitor.Plugins && window.Capacitor.Plugins.App;
   if (CapApp && CapApp.addListener){
-    // Mute and suspend audio when going to the background (incoming call, Control Center, home, etc).
-    CapApp.addListener("appStateChange", ({ isActive }) => { if (!isActive) stopForBackground(); });
+    // More reliable than visibilitychange on iOS (incoming call, Control Centre, home).
+    CapApp.addListener("appStateChange", ({ isActive }) => { isActive ? wake() : hardStop(); });
 
     if (window.Capacitor.getPlatform && window.Capacitor.getPlatform() === "android"){
       // Android's hardware/gesture back button: there's no in-app navigation, so exit.
-      CapApp.addListener("backButton", () => CapApp.exitApp());
+      CapApp.addListener("backButton", () => { hardStop(); CapApp.exitApp(); });
     }
-  } else {
-    document.addEventListener("visibilitychange", () => { if (document.hidden) stopForBackground(); });
   }
 }
 

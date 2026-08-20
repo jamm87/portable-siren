@@ -215,6 +215,41 @@ input[type=range]:focus-visible::-webkit-slider-thumb{outline:2px solid var(--cr
 .mem-btn.filled{color:var(--brass);border-color:rgba(201,162,39,.45)}
 .mem-btn.saved{background:linear-gradient(#E5CE7E,#C9A227);color:var(--ink)}
 
+/* ---------- layout modes ----------
+   1 STACK  every section stacked, config pane scrolls (the default)
+   2 TABS   one section at a time behind SIREN/ECHO/OUT tabs, nothing scrolls
+   3 SPLIT  sections side by side, collapsing to one column when too narrow  */
+.lay-btn[aria-pressed=true]{
+  background:linear-gradient(#E5CE7E,#C9A227);color:var(--ink);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.35);
+}
+
+.tabs{display:none;gap:6px;margin-bottom:4px}
+.tab{font-size:10px;letter-spacing:.12em;min-height:34px}
+
+body[data-layout="2"] .tabs{display:flex}
+body[data-layout="2"] .pane{display:none}
+body[data-layout="2"] .pane.active{display:block}
+/* the first heading is redundant when the tab above already names the section */
+body[data-layout="2"] .pane > .rule:first-child{display:none}
+
+body[data-layout="3"] .panes{
+  display:grid;gap:0 14px;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+}
+body[data-layout="3"] .pane[data-pane="out"]{grid-column:1/-1}
+/* Narrow columns: label and value share the top line, slider sits below them.
+   order:3 moves the slider past the output, which the markup puts before it,
+   otherwise the value wraps under the slider and reads as the next control's. */
+body[data-layout="3"] .ctrl{flex-wrap:wrap;margin:6px 0 10px}
+body[data-layout="3"] .ctrl label{flex:1 1 auto}
+body[data-layout="3"] .ctrl output{flex:0 0 auto}
+body[data-layout="3"] .ctrl input[type=range]{order:3;flex:1 1 100%;height:30px}
+body[data-layout="3"] .ctrl .chips{order:3;flex:1 1 100%}
+
+/* Tabs mode exists for tight screens — drop the help text so it all fits. */
+body[data-layout="2"] footer{display:none}
+
 footer{
   font-family:var(--mono);font-size:10px;line-height:1.6;color:#5D6E60;
   padding:14px 6px 0;text-align:center;

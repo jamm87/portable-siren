@@ -53,6 +53,15 @@
 
   <div class="config">
 
+  <div class="tabs" id="tabs">
+    <button class="chip tab" data-tab="siren" aria-pressed="true">SIREN</button>
+    <button class="chip tab" data-tab="echo" aria-pressed="false">ECHO</button>
+    <button class="chip tab" data-tab="out" aria-pressed="false">OUT</button>
+  </div>
+
+  <div class="panes">
+  <section class="pane" data-pane="siren">
+
   <div class="rule">SIREN</div>
 
   <div class="ctrl">
@@ -96,6 +105,9 @@
     <output id="spreadV">—</output>
   </div>
 
+  </section>
+  <section class="pane" data-pane="echo">
+
   <div class="rule">ECHO</div>
 
   <div class="ctrl">
@@ -118,6 +130,9 @@
     <input type="range" id="send" min="0" max="1000" value="700">
     <output id="sendV">—</output>
   </div>
+
+  </section>
+  <section class="pane" data-pane="out">
 
   <div class="rule">OUT</div>
 
@@ -142,6 +157,17 @@
     <button class="preset mem-btn" data-slot="0">— 1 —</button>
     <button class="preset mem-btn" data-slot="1">— 2 —</button>
     <button class="preset mem-btn" data-slot="2">— 3 —</button>
+  </div>
+
+  </section>
+  </div>
+
+  <div class="rule">LAYOUT</div>
+
+  <div class="presets" id="layouts">
+    <button class="preset lay-btn" data-layout="1">1 · STACK</button>
+    <button class="preset lay-btn" data-layout="2">2 · TABS</button>
+    <button class="preset lay-btn" data-layout="3">3 · SPLIT</button>
   </div>
 
   <div class="status">

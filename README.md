@@ -129,9 +129,18 @@ Neither is set up yet.
 
 ### Layout
 
-The oscilloscope, touch plate, and the Latch/Stop/Tap/Feedback row always stay on screen and never scroll away — everything below (SIREN, ECHO, OUT, presets, Mem, status) lives in its own scrollable area, so you can always get back to the plate without hunting through the page. Turn the phone sideways and the layout splits in half: the plate takes the left 50% of the screen, the scrollable controls take the right 50% — so you can keep one finger on the plate while the other hand dials in a sound at the same time.
+The oscilloscope, touch plate, and the Latch/Stop/Tap/Feedback row always stay on screen and never scroll away, in every mode. Turn the phone sideways and the performance area moves to the left 50% of the screen with the controls on the right — so you can keep one finger on the plate while the other hand dials in a sound at the same time.
+
+How the controls below are arranged is up to you — pick one of three modes with the **LAYOUT** buttons near the bottom. The choice is remembered on the device.
+
+| Mode | What it does |
+|---|---|
+| **1 · STACK** | SIREN, ECHO and OUT stacked in one scrolling column. The default. |
+| **2 · TABS** | One section at a time behind SIREN/ECHO/OUT tabs — everything fits on a small screen with no scrolling. |
+| **3 · SPLIT** | SIREN and ECHO side by side in two columns, dropping to one column automatically when there isn't room. |
 
 - **SIREN** controls (waveform, sweep shape, pitch, rate, depth, spread), **ECHO** (time, repeats, tone, send), and **OUT** (volume).
 - Quick presets: AIR RAID, POLICE, LASER, UFO, WHOOP, DUB. Each one is solved from real target frequencies and cycle times, not eyeballed — e.g. AIR RAID actually sweeps 150→450 Hz over a 6s wail, POLICE alternates 520↔720 Hz about twice a second. **DUB** is the pure dub siren: a plain sine tone with no detune at all, warbling one clean octave (300→600 Hz) about once a second into a long 378 ms echo at 0.80 feedback. See the comments above the `PRESETS` object in `www/app.js` for the exact numbers behind every preset. If one still doesn't land for you, the sliders show exactly what values it set, so you can nudge it from there.
 - **Mem**: 3 slots for your own settings, separate from the built-in presets. **Hold** a Mem button (~0.6s) to save the current sound into that slot — it flashes gold and switches from "— 1 —" to "MEM 1" to show it's filled. **Tap** a filled slot to instantly recall it. Saved slots persist on the device (localStorage), so they survive closing the app.
 - The status line at the bottom shows the audio engine state and sample rate, plus a **TEST TONE** button to confirm sound is working.
+- Leaving the app — switching apps, locking the screen, or closing the tab — silences the siren and the echo tail with it, and suspends the audio engine. Coming back restores everything ready to play.
