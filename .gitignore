@@ -8,4 +8,21 @@ ios/App/DerivedData/
 *.xcuserstate
 xcuserdata/
 
+# Android build products and local machine config
+android/build/
+android/app/build/
+android/.gradle/
+android/local.properties
+android/app/src/main/assets/public/
+android/app/src/main/assets/capacitor.config.json
+android/app/src/main/assets/capacitor.plugins.json
+
+# Signing material — must never reach the repo
+*.keystore
+*.jks
+keystore.properties
+android/keystore.properties
+google-services.json
+play-service-account*.json
+
 .DS_Store

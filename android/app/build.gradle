@@ -1,14 +1,44 @@
 apply plugin: 'com.android.application'
 
+// Release signing. Never commit a keystore or its passwords: this reads them
+// from android/keystore.properties (local, gitignored) or, failing that, from
+// environment variables (CI secrets). With neither present the release build
+// simply stays unsigned, so debug builds keep working on a clean checkout.
+def keystorePropsFile = rootProject.file("keystore.properties")
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) {
+    keystorePropsFile.withInputStream { keystoreProps.load(it) }
+}
+def signingStorePath = keystoreProps['storeFile'] ?: System.getenv('ANDROID_KEYSTORE_PATH')
+def signingStorePass = keystoreProps['storePassword'] ?: System.getenv('ANDROID_KEYSTORE_PASSWORD')
+def signingKeyAlias  = keystoreProps['keyAlias'] ?: System.getenv('ANDROID_KEY_ALIAS')
+def signingKeyPass   = keystoreProps['keyPassword'] ?: System.getenv('ANDROID_KEY_PASSWORD')
+def hasSigning = signingStorePath && file(signingStorePath).exists() &&
+                 signingStorePass && signingKeyAlias && signingKeyPass
+
 android {
     namespace = "com.jamm87.dubsiren"
     compileSdk = rootProject.ext.compileSdkVersion
+
+    signingConfigs {
+        release {
+            if (hasSigning) {
+                storeFile file(signingStorePath)
+                storePassword signingStorePass
+                keyAlias signingKeyAlias
+                keyPassword signingKeyPass
+            }
+        }
+    }
+
     defaultConfig {
         applicationId "com.jamm87.dubsiren"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        // Overridable from CI: -PversionCode=5 -PversionName=1.1
+        // Play rejects an upload whose versionCode isn't higher than the last.
+        versionCode (project.findProperty("versionCode") ?: "1").toString().toInteger()
+        versionName (project.findProperty("versionName") ?: "1.0").toString()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -20,6 +50,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (hasSigning) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 }
