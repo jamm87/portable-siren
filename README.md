@@ -102,34 +102,7 @@ Every time you edit `www/index.html`, `style.css`, or `app.js`:
   ```
   The APK ends up at `android/app/build/outputs/apk/debug/app-debug.apk`.
 
-## Publishing to the Play Store
 
-**→ Full step-by-step guide: [docs/PLAY_STORE.md](docs/PLAY_STORE.md)**
-
-The repo is set up for it: release signing reads its keystore from outside the
-repo (local `android/keystore.properties` or CI secrets), and
-`.github/workflows/release.yml` builds a signed App Bundle when you push a
-version tag:
-
-```bash
-git tag v1.0 && git push origin v1.0
-```
-
-That produces `DubSiren-1.0.aab` on a GitHub release, ready to upload in Play
-Console. What's left is outside the code: a $25 Play Console account, the store
-artwork (icon, feature graphic, screenshots), and the review wait. The privacy
-policy Play requires is already written and published at
-[/privacy.html](https://jamm87.github.io/portable-siren/privacy.html).
-
-Note the debug APK on the `android-latest` release is for sideloading only —
-Play won't accept it.
-
-## Publishing to the App Store (not set up)
-
-Needs an Apple Developer Program account (paid), archiving in Xcode
-(Product → Archive), and uploading via TestFlight/App Store Connect. The
-icon/splash in `ios/App/App/Assets.xcassets` are already fine for
-development/TestFlight.
 
 ## Using the app
 
