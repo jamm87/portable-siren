@@ -1,4 +1,4 @@
-const CACHE = "dub-siren-v8";
+const CACHE = "dub-siren-v9";
 const ASSETS = [
   "./",
   "./index.html",
