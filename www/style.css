@@ -17,47 +17,57 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 
 html,body{margin:0;padding:0;background:var(--ink);height:100%;}
+/* position:fixed + inset:0 is resolved against the real viewport by the
+   browser itself, so it fills the screen exactly on iOS standalone where
+   100dvh, -webkit-fill-available and window.innerHeight all under-report and
+   left a black band under the chassis. No padding here: the safe-area insets
+   live inside .chassis instead, so the enamel reaches every edge. */
 body{
+  position:fixed;inset:0;
+  margin:0;padding:0;
   font-family:var(--display);
   color:var(--cream);
   touch-action:manipulation;
   -webkit-user-select:none;user-select:none;
   -webkit-touch-callout:none;
   overscroll-behavior:none;
-  padding:
-    calc(env(safe-area-inset-top) + 10px)
-    calc(env(safe-area-inset-right) + 10px)
-    calc(env(safe-area-inset-bottom) + 10px)
-    calc(env(safe-area-inset-left) + 10px);
-  max-width:620px;margin:0 auto;
-  /* Last one that resolves wins. --app-h is set from window.innerHeight in
-     app.js because iOS standalone/WKWebView doesn't always give the real
-     screen height for dvh, which left a black band under the chassis. */
-  height:100vh;
-  height:-webkit-fill-available;
-  height:100dvh;
-  height:var(--app-h, 100dvh);
   display:flex;flex-direction:column;
   overflow:hidden;
 }
 
 /* ---------- chassis ---------- */
-/* The chassis is a fixed-height flex column: .perf (scope/plate/transport)
+/* Fills the whole screen and is a flex column: .perf (scope/plate/transport)
    never scrolls, .config scrolls on its own below it — so the oscilloscope
    and touch plate stay reachable without hunting through the page. */
 .chassis{
   background:
     radial-gradient(120% 80% at 50% 0%, var(--enamel-hi), var(--enamel) 55%, #16281F 100%);
-  border-radius:14px;
-  padding:14px 14px 18px;
+  width:100%;max-width:620px;margin:0 auto;
+  padding:
+    calc(env(safe-area-inset-top) + 10px)
+    calc(env(safe-area-inset-right) + 14px)
+    calc(env(safe-area-inset-bottom) + 10px)
+    calc(env(safe-area-inset-left) + 14px);
   position:relative;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.10),
-    inset 0 -2px 0 rgba(0,0,0,.5),
-    0 12px 30px rgba(0,0,0,.7);
+    inset 0 -2px 0 rgba(0,0,0,.5);
   flex:1 1 auto;min-height:0;
   display:flex;flex-direction:column;
   overflow:hidden;
+}
+/* Float it with rounded corners only on genuinely large screens. Both
+   dimensions must qualify, otherwise a phone in landscape (e.g. 812x375)
+   would match on width alone and stop filling the screen. */
+@media (min-width:660px) and (min-height:660px){
+  .chassis{
+    border-radius:14px;margin:10px auto;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.10),
+      inset 0 -2px 0 rgba(0,0,0,.5),
+      0 12px 30px rgba(0,0,0,.7);
+  }
+  .chassis::after{border-radius:14px}
 }
 
 .perf{flex:0 0 auto}
@@ -75,7 +85,7 @@ body{
 
 /* screen-print grain */
 .chassis::after{
-  content:"";position:absolute;inset:0;border-radius:14px;pointer-events:none;
+  content:"";position:absolute;inset:0;pointer-events:none;
   background-image:radial-gradient(rgba(255,255,255,.035) 1px, transparent 1px);
   background-size:3px 3px;mix-blend-mode:overlay;
 }
@@ -88,8 +98,18 @@ body{
   content:"";position:absolute;left:2px;right:2px;top:5px;height:1px;
   background:rgba(0,0,0,.55);transform:rotate(28deg);
 }
-.screw.tl{top:8px;left:8px}.screw.tr{top:8px;right:8px}
-.screw.bl{bottom:8px;left:8px}.screw.br{bottom:8px;right:8px}
+/* Kept clear of the notch and home indicator now the chassis is edge to edge.
+   The bottom pair would sit on top of the scrolling controls, so they only
+   come back when the chassis floats as a panel on a large screen. */
+.screw{--screw-x:6px}
+.screw.bl,.screw.br{display:none}
+@media (min-width:660px) and (min-height:660px){
+  .screw.bl,.screw.br{display:block}
+}
+.screw.tl{top:calc(env(safe-area-inset-top) + 6px);left:calc(env(safe-area-inset-left) + var(--screw-x))}
+.screw.tr{top:calc(env(safe-area-inset-top) + 6px);right:calc(env(safe-area-inset-right) + var(--screw-x))}
+.screw.bl{bottom:calc(env(safe-area-inset-bottom) + 6px);left:calc(env(safe-area-inset-left) + var(--screw-x))}
+.screw.br{bottom:calc(env(safe-area-inset-bottom) + 6px);right:calc(env(safe-area-inset-right) + var(--screw-x))}
 
 /* ---------- header ---------- */
 header{display:flex;align-items:baseline;gap:8px;padding:0 12px 10px;}
@@ -309,8 +329,7 @@ footer b{color:#8B9A83;font-weight:400}
    (header/.scope/.plate/.btnrow) at equal specificity. Lets a finger stay on
    the plate while the other hand works the sliders. */
 @media (orientation:landscape){
-  body{max-width:none}
-  .chassis{flex-direction:row;gap:16px}
+  .chassis{flex-direction:row;gap:16px;max-width:none}
   .perf{
     flex:0 0 50%;max-width:50%;min-height:0;
     display:flex;flex-direction:column;
@@ -318,5 +337,10 @@ footer b{color:#8B9A83;font-weight:400}
   header,.scope,.btnrow{flex:0 0 auto}
   .plate-wrap{flex:1 1 auto;min-height:0}
   .plate{height:100%;min-height:60px}
-  .config{flex:1 1 50%}
+  /* the panes sit side by side here, so the boundary is vertical, not on top */
+  .config{
+    flex:1 1 50%;
+    border-top:none;padding-top:0;
+    border-left:1px solid rgba(0,0,0,.45);padding-left:14px;
+  }
 }

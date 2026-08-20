@@ -367,13 +367,7 @@ function fit(cv, c){
   c.setTransform(d,0,0,d,0,0);
   return [r.width, r.height];
 }
-// iOS standalone/WKWebView can report a dvh shorter than the real screen,
-// leaving a black band under the chassis. innerHeight is accurate there.
-function setAppHeight(){
-  document.documentElement.style.setProperty("--app-h", window.innerHeight + "px");
-}
 function resize(){
-  setAppHeight();
   [plateW, plateH] = fit(plate, pctx);
   [scopeW, scopeH] = fit(scope, sctx);
 }
