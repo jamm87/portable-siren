@@ -300,9 +300,11 @@ const PRESETS = {
   // oscillator detune for an unstable, beating shimmer — a hovering,
   // otherworldly hum.
   ufo:    {pitch:.58,rate:.18,depth:.10,spread:.25,dtime:.55,fback:.60,tone:.50,send:.70,wave:"triangle",shape:"sine"},
-  // Rising sawtooth ramp from 150 Hz to 620 Hz repeated a bit faster than
-  // once a second — the classic "whoop-whoop" rising alarm.
-  whoop:  {pitch:.52,rate:.39,depth:.29,spread:.06,dtime:.40,fback:.55,tone:.50,send:.60,wave:"sine",shape:"sawtooth"},
+  // Big air/ship horn: a sustained 164 Hz sawtooth blast rather than a sweep
+  // (the waver spans well under a semitone), with the two oscillators detuned
+  // 36 cents so they beat against each other at ~3.4 Hz — the growl of a
+  // twin-reed horn — under a dark 297 ms harbour echo.
+  horn:   {pitch:.35,rate:.34,depth:.01,spread:.04,dtime:.62,fback:.72,tone:.41,send:.55,wave:"sawtooth",shape:"sine"},
   // Pure classic dub siren: plain sine tone, sine sweep, zero detune (no
   // chorus/beating — just the one clean pitch). Warbles smoothly between
   // ~300 Hz and ~600 Hz about once a second, thrown into a long, heavy-
@@ -429,6 +431,8 @@ const shapeFn = {
   square: p => ((p%1) < .5 ? 1 : -1)
 };
 const trace = new Array(180).fill(0);
+// matches --mono in style.css, for the canvas overlay label
+const MONO = 'ui-monospace,"SF Mono",Menlo,"Courier New",monospace';
 
 function draw(now){
   requestAnimationFrame(draw);
@@ -464,6 +468,21 @@ function draw(now){
     trace.fill(f);   // keep the buffer primed so the trace doesn't jump when sound resumes
     sctx.strokeStyle = "#2E3F30"; sctx.lineWidth = 1.6;
     sctx.beginPath(); sctx.moveTo(0,scopeH/2+.5); sctx.lineTo(scopeW,scopeH/2+.5); sctx.stroke();
+  }
+
+  /* --- Feedback held: soft red pulse over the scope, with a corner label --- */
+  if (blast){
+    const pulse = .18 + .17*(.5 + .5*Math.sin(t*2*Math.PI*2.2));   // ~2.2 Hz, stays gentle
+    sctx.fillStyle = "rgba(166,58,49," + pulse.toFixed(3) + ")";
+    sctx.fillRect(0,0,scopeW,scopeH);
+    sctx.strokeStyle = "rgba(214,92,80," + (pulse + .30).toFixed(3) + ")";
+    sctx.lineWidth = 1;
+    sctx.strokeRect(.5,.5,scopeW-1,scopeH-1);
+    sctx.font = "600 8px " + MONO;
+    sctx.textAlign = "right"; sctx.textBaseline = "top";
+    sctx.fillStyle = "rgba(255,214,208," + (.55 + pulse).toFixed(3) + ")";
+    sctx.fillText("FEEDBACK ON", scopeW - 5, 4);
+    sctx.textAlign = "left";   // leave the context as the rest of draw() expects
   }
 
   /* --- plate --- */
