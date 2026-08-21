@@ -80,6 +80,7 @@ body{
      otherwise sliders slide right up under the transport row with no edge. */
   border-top:1px solid rgba(0,0,0,.45);
   padding-top:8px;
+  padding-bottom:max(8px, env(safe-area-inset-bottom) + 8px);
 }
 .pane > .rule:first-child{margin-top:4px}
 
