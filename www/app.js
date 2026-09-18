@@ -279,7 +279,7 @@ const tapBtn = el("tap");
 const TAP_LABEL = "Tap";
 let tapTimes = [];
 let tapResetTimer = null;
-tapBtn.addEventListener("click", () => {
+function registerTap(){
   const now = performance.now();
   if (tapTimes.length && now - tapTimes[tapTimes.length-1] > 2000) tapTimes = []; // idle too long: restart
   tapTimes.push(now);
@@ -296,7 +296,14 @@ tapBtn.addEventListener("click", () => {
   P.rate = clamp(unlog(hz, .15, 28), 0, 1);
   refresh();
   tapBtn.textContent = Math.round(hz*60) + " BPM";
-});
+}
+
+// pointerdown, not click: same reason as Latch above — a second finger landing
+// here while the plate already holds a captured pointer never gets a
+// synthesised click. It also times each tap from when the finger lands rather
+// than when it lifts, which is the beat you're actually tapping to.
+tapBtn.addEventListener("pointerdown", e => { e.preventDefault(); registerTap(); });
+tapBtn.addEventListener("click", e => { if (e.detail === 0) registerTap(); });
 
 /* ---------------- presets ---------------- */
 // pitch/rate/depth below are solved (not guessed) from real target

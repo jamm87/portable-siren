@@ -111,7 +111,7 @@ Every time you edit `www/index.html`, `style.css`, or `app.js`:
 - **Latch** keeps the siren sounding without holding your finger down. You can hit it *while still holding the plate* — land on a sound you like, tap Latch with a second finger, lift off, and that exact sound keeps running. Tapping it again mid-hold releases the latch without cutting the note under your finger.
 - **Stop** cuts the siren immediately — but only the dry tone. If there's echo/feedback going, the delay trail keeps ringing out on its own instead of being chopped off dead.
 - **Feedback** drives the echo feedback to maximum while held. While it's down the oscilloscope pulses red and shows **FEEDBACK ON** in its top-right corner, so you can tell at a glance the echo is being pushed.
-- **Tap** (in the main button row): tap it a few times at the pace you want and RATE snaps to match — the button itself switches from "Tap" to showing the calculated BPM. Pause more than 2s and it resets back to "Tap".
+- **Tap** (in the main button row): tap it a few times at the pace you want and RATE snaps to match — the button itself switches from "Tap" to showing the calculated BPM. Pause more than 2s and it resets back to "Tap". Like Latch, it works while you're still holding the plate, so you can dial in the tempo with a second finger without dropping the note.
 
 ### Layout
 
