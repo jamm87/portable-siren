@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Dub Siren">
-<meta name="theme-color" content="#101B15">
+<meta name="theme-color" id="themeColor" content="#0B0D08">
 <title>Portable Dub Siren</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png">
@@ -177,13 +177,24 @@
   <div class="status">
     AUDIO: <b id="stat">standby</b>
     <div class="fb-wrap">
-      <button id="feedbackBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Send feedback">✉</button>
+      <button id="feedbackBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Send feedback">
+        <svg viewBox="0 0 16 12" width="15" height="12" aria-hidden="true">
+          <rect x="0.75" y="0.75" width="14.5" height="10.5" fill="none" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M0.75 0.75 L8 7 L15.25 0.75" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </button>
       <div class="fb-menu" id="feedbackMenu" hidden>
         <a href="https://github.com/jamm87/portable-siren/issues/new" target="_blank" rel="noopener">Report on GitHub ↗</a>
         <a href="mailto:PortableDubSiren@gmail.com?subject=Portable%20Dub%20Siren%20feedback">Email us ↗</a>
       </div>
     </div>
     <button id="test">TEST TONE</button>
+    <button id="themeBtn" type="button" aria-label="Switch between light and dark mode">
+      <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M8 1.4 A6.6 6.6 0 0 1 8 14.6 Z" fill="currentColor"/>
+      </svg>
+    </button>
   </div>
 
   <footer>

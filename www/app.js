@@ -22,6 +22,44 @@ const DTIME = () => logMap(P.dtime, .035, 1.1);
 const FB    = () => P.fback * .92;
 const TONE  = () => logMap(P.tone, 260, 9000);
 
+/* ---------------- theme: A light ground / B dark ground ----------------
+   The CSS follows prefers-color-scheme on its own; a stored choice pins
+   data-theme on <html> and overrides it. The canvas draws the scope and plate
+   itself, so it can't inherit any of this — it reads the same custom
+   properties into SKIN and redraws from there. */
+const THEME_KEY = "dubsiren-theme-v1";
+let SKIN = {};
+function readSkin(){
+  const cs = getComputedStyle(document.documentElement);
+  const g = n => cs.getPropertyValue(n).trim();
+  SKIN = {
+    bg: g("--bg"), fg: g("--fg"), field: g("--field"),
+    grid: g("--grid"), gridSoft: g("--grid-soft"),
+    trace: g("--trace"), traceIdle: g("--trace-idle"),
+    traceRgb: g("--trace-rgb"), hotRgb: g("--hot-rgb")
+  };
+  const meta = el("themeColor");
+  if (meta) meta.setAttribute("content", SKIN.bg);
+}
+const systemDark = () =>
+  !!(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+let themeMode = null;   // null = follow the system
+try {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === "light" || saved === "dark") themeMode = saved;
+} catch(e){}
+function applyTheme(){
+  if (themeMode) document.documentElement.dataset.theme = themeMode;
+  else delete document.documentElement.dataset.theme;
+  readSkin();
+}
+applyTheme();
+if (window.matchMedia){
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  const follow = () => { if (!themeMode) readSkin(); };
+  if (mq.addEventListener) mq.addEventListener("change", follow); else mq.addListener(follow);
+}
+
 /* ---------------- audio engine ---------------- */
 let ctx, master, comp, dry, osc1, osc2, mix, voice,
     lfo, lfoAmt, send, delay, fbGain, fbFilt, hp, sat, echoOut;
@@ -205,16 +243,23 @@ const fmt = {
   send:  () => Math.round(P.send*100) + " %",
   vol:   () => Math.round(P.vol*100) + " %"
 };
+// The console bar fills from the left, which a native range can't express:
+// the track paints a hard-stop gradient at this percentage instead.
+const setFill = s => s.style.setProperty("--fill", (s.value/10) + "%");
 const keys = Object.keys(fmt);
 keys.forEach(k => {
   const s = el(k), o = el(k+"V");
   s.value = P[k]*1000;
-  const upd = () => { P[k] = s.value/1000; o.textContent = fmt[k](); apply(); };
+  const upd = () => { P[k] = s.value/1000; o.textContent = fmt[k](); setFill(s); apply(); };
   s.addEventListener("input", upd);
   o.textContent = fmt[k]();
+  setFill(s);
 });
 function refresh(){
-  keys.forEach(k => { el(k).value = P[k]*1000; el(k+"V").textContent = fmt[k](); });
+  keys.forEach(k => {
+    const s = el(k);
+    s.value = P[k]*1000; el(k+"V").textContent = fmt[k](); setFill(s);
+  });
   apply();
 }
 
@@ -471,8 +516,8 @@ function draw(now){
 
   /* --- scope: live pitch trace, flat when silent --- */
   sctx.clearRect(0,0,scopeW,scopeH);
-  sctx.fillStyle = "#060A07"; sctx.fillRect(0,0,scopeW,scopeH);
-  sctx.strokeStyle = "rgba(201,162,39,.10)"; sctx.lineWidth = 1;
+  sctx.fillStyle = SKIN.field; sctx.fillRect(0,0,scopeW,scopeH);
+  sctx.strokeStyle = SKIN.gridSoft; sctx.lineWidth = 1;
   for (let i=1;i<4;i++){
     const y = scopeH*i/4; sctx.beginPath();
     sctx.moveTo(0,y+.5); sctx.lineTo(scopeW,y+.5); sctx.stroke();
@@ -485,21 +530,21 @@ function draw(now){
       const y = scopeH - clamp(unlog(clamp(trace[i],40,9000),40,9000),0,1)*(scopeH-8) - 4;
       i ? sctx.lineTo(x,y) : sctx.moveTo(x,y);
     }
-    sctx.strokeStyle = "#C9A227"; sctx.lineWidth = 1.6; sctx.lineJoin = "round";
-    sctx.shadowColor = "rgba(201,162,39,.85)"; sctx.shadowBlur = 7;
+    sctx.strokeStyle = SKIN.trace; sctx.lineWidth = 1.6; sctx.lineJoin = "round";
+    sctx.shadowColor = "rgba(" + SKIN.traceRgb + ",.85)"; sctx.shadowBlur = 7;
     sctx.stroke(); sctx.shadowBlur = 0;
   } else {
     trace.fill(f);   // keep the buffer primed so the trace doesn't jump when sound resumes
-    sctx.strokeStyle = "#2E3F30"; sctx.lineWidth = 1.6;
+    sctx.strokeStyle = SKIN.traceIdle; sctx.lineWidth = 1.6;
     sctx.beginPath(); sctx.moveTo(0,scopeH/2+.5); sctx.lineTo(scopeW,scopeH/2+.5); sctx.stroke();
   }
 
   /* --- Feedback held: soft red pulse over the scope, with a corner label --- */
   if (blast){
     const pulse = .18 + .17*(.5 + .5*Math.sin(t*2*Math.PI*2.2));   // ~2.2 Hz, stays gentle
-    sctx.fillStyle = "rgba(166,58,49," + pulse.toFixed(3) + ")";
+    sctx.fillStyle = "rgba(" + SKIN.hotRgb + "," + pulse.toFixed(3) + ")";
     sctx.fillRect(0,0,scopeW,scopeH);
-    sctx.strokeStyle = "rgba(214,92,80," + (pulse + .30).toFixed(3) + ")";
+    sctx.strokeStyle = "rgba(" + SKIN.hotRgb + "," + (pulse + .55).toFixed(3) + ")";
     sctx.lineWidth = 1;
     sctx.strokeRect(.5,.5,scopeW-1,scopeH-1);
     sctx.font = "600 8px " + MONO;
@@ -511,8 +556,8 @@ function draw(now){
 
   /* --- plate --- */
   pctx.clearRect(0,0,plateW,plateH);
-  pctx.fillStyle = "#0A130D"; pctx.fillRect(0,0,plateW,plateH);
-  pctx.strokeStyle = "rgba(232,226,206,.055)"; pctx.lineWidth = 1;
+  pctx.fillStyle = SKIN.field; pctx.fillRect(0,0,plateW,plateH);
+  pctx.strokeStyle = SKIN.grid; pctx.lineWidth = 1;
   for (let i=1;i<8;i++){
     const x = plateW*i/8; pctx.beginPath();
     pctx.moveTo(x+.5,0); pctx.lineTo(x+.5,plateH); pctx.stroke();
@@ -527,18 +572,18 @@ function draw(now){
 
   if (playing){
     const g = pctx.createRadialGradient(cx,cy,0,cx,cy,88*glow);
-    g.addColorStop(0,"rgba(201,162,39,.42)");
-    g.addColorStop(1,"rgba(201,162,39,0)");
+    g.addColorStop(0,"rgba(" + SKIN.traceRgb + ",.42)");
+    g.addColorStop(1,"rgba(" + SKIN.traceRgb + ",0)");
     pctx.fillStyle = g; pctx.fillRect(0,0,plateW,plateH);
   }
-  pctx.strokeStyle = playing ? "rgba(201,162,39,.55)" : "rgba(232,226,206,.22)";
+  pctx.strokeStyle = playing ? "rgba(" + SKIN.traceRgb + ",.55)" : SKIN.traceIdle;
   pctx.lineWidth = 1;
   pctx.beginPath();
   pctx.moveTo(0,cy+.5); pctx.lineTo(plateW,cy+.5);
   pctx.moveTo(cx+.5,0); pctx.lineTo(cx+.5,plateH); pctx.stroke();
 
   pctx.beginPath(); pctx.arc(cx,cy,playing ? 9+6*Math.abs(v) : 8,0,7);
-  pctx.fillStyle = playing ? "#E5CE7E" : "#3C4E41"; pctx.fill();
+  pctx.fillStyle = playing ? SKIN.trace : SKIN.traceIdle; pctx.fill();
 }
 resize();
 requestAnimationFrame(draw);
@@ -591,6 +636,16 @@ el("test").addEventListener("click", () => {
   g.gain.setTargetAtTime(.28, t, .01);
   g.gain.setTargetAtTime(0, t + .45, .05);
   o.stop(t + 1.2);
+});
+
+/* ---------------- theme toggle ---------------- */
+// Resolve what's actually on screen before flipping, so the first press from
+// "follow the system" goes to the opposite of what you're looking at.
+el("themeBtn").addEventListener("click", () => {
+  const dark = themeMode ? themeMode === "dark" : systemDark();
+  themeMode = dark ? "light" : "dark";
+  applyTheme();
+  try { localStorage.setItem(THEME_KEY, themeMode); } catch(e){}
 });
 
 /* ---------------- feedback popover ---------------- */
