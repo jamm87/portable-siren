@@ -100,10 +100,15 @@ body{
 .chassis{
   background:var(--bg);
   width:100%;max-width:620px;margin:0 auto;
+  /* No bottom padding on purpose. Padding here sits BELOW .config, so it
+     shortens the scroller and leaves dead ground under it — 44px of it on an
+     iPhone 12 mini, on top of the 42px .config already reserved, for a home
+     indicator that needs 34. The bottom inset is accounted for exactly once,
+     inside .config, so the scroll area itself reaches the screen edge. */
   padding:
     calc(env(safe-area-inset-top) + 10px)
     calc(env(safe-area-inset-right) + 12px)
-    calc(env(safe-area-inset-bottom) + 10px)
+    0
     calc(env(safe-area-inset-left) + 12px);
   position:relative;
   flex:1 1 auto;min-height:0;
@@ -127,7 +132,9 @@ body{
      otherwise sliders slide right up under the transport row with no edge. */
   border-top:1px solid var(--line);
   padding-top:8px;
-  padding-bottom:max(8px, env(safe-area-inset-bottom) + 8px);
+  /* the one place the bottom inset is paid for: lets the last row scroll clear
+     of the home indicator without pushing the scroller off the screen */
+  padding-bottom:calc(env(safe-area-inset-bottom) + 10px);
 }
 .pane > .rule:first-child{margin-top:4px}
 
@@ -400,6 +407,8 @@ footer a{color:var(--fg);text-decoration:underline}
     display:flex;flex-direction:column;
   }
   header,.scope,.btnrow{flex:0 0 auto}
+  /* side by side, so the performance column touches the bottom edge too */
+  .perf{padding-bottom:calc(env(safe-area-inset-bottom) + 4px)}
   .plate-wrap{flex:1 1 auto;min-height:0}
   .plate{height:100%;min-height:60px}
   /* the panes sit side by side here, so the boundary is vertical, not on top */
