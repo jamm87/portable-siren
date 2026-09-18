@@ -236,11 +236,28 @@ function syncChips(){
 
 /* ---------------- buttons ---------------- */
 const latchBtn = el("latch");
-latchBtn.addEventListener("click", () => {
+
+// Is a finger physically down on something that's sounding right now?
+const holding = () => touchId !== null || presetPointer !== null;
+
+function toggleLatch(){
   latch = !latch;
   latchBtn.setAttribute("aria-pressed", latch);
-  if (latch) on(); else off();
-});
+  // Latching mid-hold is the whole point: you find a sound on the plate and
+  // pin it without lifting. Unlatching mid-hold must leave it running too —
+  // the finger is still down, so off() here would mute under it.
+  if (latch) on();
+  else if (!holding()) off();
+}
+
+// pointerdown, not click: with the plate already holding a captured pointer,
+// iOS doesn't synthesise a click for a second finger landing here, so
+// "hold the plate, tap Latch" silently did nothing. Feedback and the presets
+// are on pointer events for the same reason.
+latchBtn.addEventListener("pointerdown", e => { e.preventDefault(); toggleLatch(); });
+// Keyboard activation (Enter/Space) arrives as a click with no pointer behind
+// it — detail 0 — which is also how a pointer-driven click gets filtered out.
+latchBtn.addEventListener("click", e => { if (e.detail === 0) toggleLatch(); });
 
 const blastBtn = el("blast");
 const blastOn  = e => { e.preventDefault(); blast = true; ensure(); apply(); };
