@@ -251,9 +251,64 @@ keys.forEach(k => {
   const s = el(k), o = el(k+"V");
   s.value = P[k]*1000;
   const upd = () => { P[k] = s.value/1000; o.textContent = fmt[k](); setFill(s); apply(); };
-  s.addEventListener("input", upd);
+  s.addEventListener("input", upd);   // keyboard: Tab to it, then arrows
   o.textContent = fmt[k]();
   setFill(s);
+
+  // iOS only drags a range input by its thumb — a touch on the track does
+  // nothing at all — and the pointer we draw is a 22x11 triangle, made smaller
+  // still as a target because clip-path clips hit-testing too. So the value is
+  // driven from the pointer's x instead: a tap anywhere on the row jumps there,
+  // and a sideways drag from anywhere slides it. Full-width mapping, so the
+  // pointer also stops drifting from the fill at the two ends, which the
+  // native half-a-thumb inset caused.
+  const setFromX = e => {
+    const r = s.getBoundingClientRect();
+    s.value = Math.round(clamp((e.clientX - r.left) / r.width, 0, 1) * 1000);
+    upd();
+  };
+  // One gesture, one outcome. "pending" until the direction is known, then
+  // either "slide" (ours) or "given-up" (the pane is scrolling). A cancelled
+  // pointer goes straight to idle WITHOUT the tap branch: letting it fall back
+  // to "pending" made the pointerup that follows a scroll read as a tap and
+  // nudge the value.
+  // Chromium moves the thumb on touchstart and keeps dragging it on touchmove,
+  // with a mapping inset by half a thumb, so left alone it overrides this and
+  // lands ~11px off. It can't be cancelled at touchstart without killing the
+  // pane's scrolling, so instead: remember the value, cancel touchmove only
+  // once the gesture is known to be sideways, and put the value back if the
+  // pane ends up taking the gesture.
+  let x0 = 0, y0 = 0, mode = "idle", v0 = 0;
+  s.addEventListener("pointerdown", e => {
+    x0 = e.clientX; y0 = e.clientY; mode = "pending"; v0 = Number(s.value);
+    e.preventDefault();   // for a mouse this is enough to stop the native drag
+    s.focus({ preventScroll: true });
+  });
+  s.addEventListener("touchmove", e => {
+    if (mode === "slide") e.preventDefault();
+  }, { passive: false });
+  s.addEventListener("pointermove", e => {
+    if (mode === "pending"){
+      const dx = Math.abs(e.clientX - x0), dy = Math.abs(e.clientY - y0);
+      if (dx < 4 && dy < 4) return;
+      if (dy > dx){ mode = "given-up"; return; }   // the pane takes it
+      mode = "slide";
+      try { s.setPointerCapture(e.pointerId); } catch(err){}
+    }
+    if (mode !== "slide") return;
+    e.preventDefault();
+    setFromX(e);
+  });
+  s.addEventListener("pointerup", e => {
+    if (mode === "pending") setFromX(e);   // a tap that never became a drag
+    mode = "idle";
+    try { s.releasePointerCapture(e.pointerId); } catch(err){}
+  });
+  s.addEventListener("pointercancel", () => {
+    // the pane is scrolling: undo the jump the native handler made on touchstart
+    if (mode !== "slide" && Number(s.value) !== v0){ s.value = v0; upd(); }
+    mode = "idle";
+  });
 });
 function refresh(){
   keys.forEach(k => {
