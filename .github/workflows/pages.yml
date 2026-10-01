@@ -1,9 +1,17 @@
-name: Deploy Dub Siren (GitHub Pages)
+name: Deploy site + app (GitHub Pages)
+
+# Publishes two things from one tree:
+#   /        the public site (landing + privacy, terms, legal notice)
+#   /app/    the web version of the instrument
+#
+# The legal pages sit at the root on purpose: Play needs the privacy policy at
+# a stable public URL, and keeping it off /app/ means the app can be withdrawn
+# later without taking the policy down with it.
 
 on:
   push:
     branches: [main]
-    paths: ["www/**", ".github/workflows/pages.yml"]
+    paths: ["site/**", "www/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -23,9 +31,20 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Assemble the published tree
+        run: |
+          mkdir -p _site/app
+          cp -r site/. _site/
+          cp -r www/. _site/app/
+          test -f _site/index.html         || { echo "::error::site index missing"; exit 1; }
+          test -f _site/privacy.html       || { echo "::error::privacy policy missing — Play needs this URL"; exit 1; }
+          test -f _site/app/index.html     || { echo "::error::app index missing"; exit 1; }
+          echo "published tree:" && find _site -maxdepth 2 -type f | sort
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: www
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4

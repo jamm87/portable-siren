@@ -11,12 +11,19 @@ A dub siren synthesizer (Web Audio API). You can install it a few ways:
 | | |
 |---|---|
 | **Download the Android APK** | **[DubSiren.apk](https://github.com/jamm87/portable-siren/releases/download/android-latest/DubSiren.apk)** — open this link on the phone in Chrome, then install. Always the latest build from `main`. |
-| **Use it in the browser / install as PWA** | **[jamm87.github.io/portable-siren](https://jamm87.github.io/portable-siren/)** — works on any device with a modern browser; on iPhone, open in Safari and use "Add to Home Screen" (see below). |
-| **Instructions / guide** | **[jamm87.github.io/portable-siren/guide.html](https://jamm87.github.io/portable-siren/guide.html)** — what every control does, also reachable from the app itself. |
+| **The site** | **[jamm87.github.io/portable-siren](https://jamm87.github.io/portable-siren/)** — landing page, privacy policy, terms and legal notice. |
+| **Use it in the browser / install as PWA** | **[/app/](https://jamm87.github.io/portable-siren/app/)** — works on any device with a modern browser; on iPhone, open in Safari and use "Add to Home Screen" (see below). Due to be withdrawn once the Android app is on Play. |
+| **Instructions / guide** | **[/app/guide.html](https://jamm87.github.io/portable-siren/app/guide.html)** — what every control does, also reachable from the app itself. |
 
 ## Structure
 
 ```
+site/                    the public website, served at the Pages root
+  index.html             landing page
+  privacy.html           privacy policy — the URL Google Play points at
+  terms.html             terms of use
+  legal.html             legal notice (LSSI identification data)
+  style.css  img/  icons/
 www/                     web code (the app itself: HTML/CSS/JS, no dependencies)
   index.html
   style.css
@@ -25,9 +32,8 @@ www/                     web code (the app itself: HTML/CSS/JS, no dependencies)
   sw.js                  service worker: caches the app for offline use
   icons/                 PWA icons
   guide.html             in-app instructions, what every control does
-  privacy.html           privacy policy (required by Google Play)
 docs/PLAY_STORE.md       step-by-step guide to publishing on Google Play
-.github/workflows/pages.yml   publishes www/ to GitHub Pages on every push to main
+.github/workflows/pages.yml   publishes site/ at the root and www/ under /app/
 .github/workflows/android.yml builds the sideloadable debug APK on every push to main
 .github/workflows/release.yml builds the signed .aab for Play when you push a v* tag
 capacitor.config.json    Capacitor configuration (appId, appName, webDir)
@@ -60,11 +66,11 @@ This whole setup can be done from Windows (or any OS) — no Mac needed.
 
 1. On `github.com/jamm87/portable-siren` → **Settings** → **Pages**.
 2. Under "Build and deployment" → "Source", pick **GitHub Actions** (not "Deploy from a branch").
-3. That's it: the `.github/workflows/pages.yml` workflow automatically publishes the contents of `www/` on every push to `main`. You can watch progress in the repo's **Actions** tab; once it finishes, the URL appears under Settings → Pages, in the form `https://jamm87.github.io/portable-siren/`.
+3. That's it: the `.github/workflows/pages.yml` workflow automatically publishes the contents of `www/` on every push to `main`. You can watch progress in the repo's **Actions** tab; once it finishes, the URL appears under Settings → Pages, in the form `https://jamm87.github.io/portable-siren/`. The site lands at that root; the app itself is at `/app/`.
 
 **Install on the iPhone:**
 
-1. Open that URL in **Safari** on the iPhone (it has to be Safari, not Chrome or another browser — only Safari can install web apps on iOS).
+1. Open `https://jamm87.github.io/portable-siren/app/` in **Safari** on the iPhone (it has to be Safari, not Chrome or another browser — only Safari can install web apps on iOS).
 2. Tap the **Share** icon (the square with an arrow pointing up).
 3. Scroll down and tap **"Add to Home Screen"**.
 4. Confirm the name ("Dub Siren") and tap **Add**.
@@ -130,12 +136,12 @@ How the controls below are arranged is up to you — pick one of three modes wit
 - **Mem**: 3 slots for your own settings, separate from the built-in presets. **Hold** a Mem button (~0.6s) to save the current sound into that slot — it flashes gold and switches from "— 1 —" to "MEM 1" to show it's filled. **Tap** a filled slot to instantly recall it. Saved slots persist on the device (localStorage), so they survive closing the app.
 - The status line at the bottom shows the audio engine state and sample rate, plus a **TEST TONE** button to confirm sound is working, a small ✉ button for sending feedback (opens a choice of GitHub or email — see below), and a **contrast button** that switches between the two grounds.
 - **Light and dark.** The interface is a flat instrument-console skin that comes in two grounds: amber with dark ink, and dark with amber ink. It follows your system setting on its own; the contrast button next to TEST TONE overrides that, and the choice is remembered on the device.
-- New to the app? The footer links to the **[guide](https://jamm87.github.io/portable-siren/guide.html)** (source: `www/guide.html`), a page explaining every control section by section.
+- New to the app? The footer links to the **[guide](https://jamm87.github.io/portable-siren/app/guide.html)** (source: `www/guide.html`), a page explaining every control section by section.
 - Leaving the app — switching apps, locking the screen, or closing the tab — silences the siren and the echo tail with it, and suspends the audio engine. Coming back restores everything ready to play.
 
 ## Feedback
 
-Two ways in, both reachable from the small ✉ button on the app's status line (or the [guide](https://jamm87.github.io/portable-siren/guide.html#feedback) page):
+Two ways in, both reachable from the small ✉ button on the app's status line (or the [guide](https://jamm87.github.io/portable-siren/app/guide.html#feedback) page):
 
 - **GitHub**: [open an issue](https://github.com/jamm87/portable-siren/issues/new)
 - **Email**: [PortableDubSiren@gmail.com](mailto:PortableDubSiren@gmail.com)

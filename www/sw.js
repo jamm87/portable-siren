@@ -1,4 +1,4 @@
-const CACHE = "dub-siren-v17";
+const CACHE = "dub-siren-v18";
 const ASSETS = [
   "./",
   "./index.html",
@@ -6,7 +6,6 @@ const ASSETS = [
   "./app.js",
   "./manifest.json",
   "./guide.html",
-  "./privacy.html",
   "./icons/icon-192.png",
   "./icons/icon-512.png"
 ];
@@ -15,9 +14,13 @@ const ASSETS = [
 // (icons, manifest) is cache-first since it rarely changes.
 const NETWORK_FIRST = new Set(["./", "./index.html", "./style.css", "./app.js"]);
 
+// Resolve against the worker's own scope rather than a hardcoded repo path:
+// the app has to keep working whether it is served from /portable-siren/app/,
+// from a custom domain's root, or anywhere else.
+const SCOPE = new URL("./", self.registration.scope).pathname;
 function pathOf(request){
-  const url = new URL(request.url);
-  const rel = url.pathname.replace(/^.*\/portable-siren\//, "./").replace(/^\/+/, "./");
+  const path = new URL(request.url).pathname;
+  const rel = "./" + (path.startsWith(SCOPE) ? path.slice(SCOPE.length) : path.replace(/^\/+/, ""));
   return rel === "./" || rel.endsWith("/") ? "./" : rel;
 }
 

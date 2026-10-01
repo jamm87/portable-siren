@@ -1,0 +1,174 @@
+/* The marketing site borrows the instrument's language — two grounds, flat
+   rectangles, condensed caps over mono figures — but it is a page to read, so
+   the measure is wide and the type is bigger than the console's.
+
+   Same token shape as www/style.css. The site has no theme switch: it follows
+   the system and that is all. */
+:root{
+  --bg:#E8931A;
+  --fg:#1A1206;
+  --line:#1A1206;
+  --dim:rgba(26,18,6,.74);
+  --faint:rgba(26,18,6,.30);
+  --field:#1A1206;
+  --on-fill:#1A1206;
+  --on-ink:#E8931A;
+  --hot:#9E2B14;
+
+  --display:"Oswald","Avenir Next Condensed","Helvetica Neue Condensed",
+            "Arial Narrow",sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,"Courier New",monospace;
+  --body:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0B0D08;
+    --fg:#F2B233;
+    --line:#5E5318;
+    --dim:#B08D2E;
+    --faint:#3E3712;
+    --field:#060804;
+    --on-fill:#F2B233;
+    --on-ink:#0B0D08;
+    --hot:#E0492C;
+  }
+}
+
+*{box-sizing:border-box}
+
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--fg);
+  font-family:var(--body);line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+
+.wrap{max-width:62rem;margin:0 auto;padding:0 1.25rem}
+.prose{max-width:44rem}
+
+/* ---------- header ---------- */
+.site-head{
+  border-bottom:1px solid var(--line);
+  padding:1.1rem 0;margin-bottom:3rem;
+}
+.site-head .wrap{display:flex;align-items:baseline;gap:.75rem;flex-wrap:wrap}
+.mark{
+  font-family:var(--display);font-weight:600;font-size:1.05rem;
+  letter-spacing:.22em;text-transform:uppercase;text-decoration:none;color:var(--fg);
+}
+.mark .pre{
+  display:block;font-family:var(--mono);font-size:.56rem;letter-spacing:.3em;
+  color:var(--dim);font-weight:400;
+}
+.site-head nav{margin-left:auto;display:flex;gap:1.1rem;flex-wrap:wrap}
+.site-head nav a{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);text-decoration:none;
+}
+.site-head nav a:hover{color:var(--fg)}
+
+/* ---------- hero ---------- */
+.kicker{
+  font-family:var(--mono);font-size:.68rem;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--dim);margin:0 0 .5rem;
+}
+h1{
+  font-family:var(--display);font-weight:600;
+  font-size:clamp(2.1rem,7vw,3.4rem);line-height:1.08;
+  letter-spacing:.14em;text-transform:uppercase;margin:0 0 1rem;
+}
+.lead{font-size:clamp(1.05rem,2.6vw,1.3rem);margin:0 0 1.75rem;max-width:34rem}
+
+.cta{display:flex;gap:.7rem;flex-wrap:wrap;margin:0 0 .9rem}
+.btn{
+  display:inline-block;font-family:var(--display);font-weight:600;
+  font-size:.95rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:.85em 1.5em;border:1px solid var(--line);
+  color:var(--fg);background:transparent;text-decoration:none;
+}
+.btn:hover{background:var(--on-fill);color:var(--on-ink);border-color:var(--on-fill)}
+.btn.solid{background:var(--on-fill);color:var(--on-ink);border-color:var(--on-fill)}
+.btn.solid:hover{opacity:.85}
+.btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+.cta-note{font-family:var(--mono);font-size:.74rem;color:var(--dim);margin:0 0 3rem}
+
+.shots{
+  display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;
+  margin:0 0 3.5rem;
+}
+.shot{flex:1 1 15rem;max-width:19rem;margin:0}
+.shot img{
+  display:block;width:100%;height:auto;
+  border:1px solid var(--line);
+}
+.shot figcaption{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--dim);margin-top:.6rem;text-align:center;
+}
+
+/* ---------- sections ---------- */
+section{margin:0 0 3.5rem}
+.rule{
+  display:flex;align-items:center;gap:.8rem;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.24em;
+  text-transform:uppercase;color:var(--dim);margin:0 0 1.2rem;
+}
+.rule::after{content:"";flex:1;height:1px;background:var(--line)}
+
+h2{
+  font-family:var(--display);font-weight:600;font-size:1.5rem;
+  letter-spacing:.06em;margin:0 0 .6rem;
+}
+h3{font-family:var(--display);font-weight:600;font-size:1.05rem;letter-spacing:.06em;margin:0 0 .3rem}
+p{margin:0 0 1rem}
+
+.grid{display:grid;gap:1.6rem 2rem;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr))}
+.grid p{color:var(--dim);margin:0}
+
+.card{border:1px solid var(--line);padding:1.2rem 1.3rem}
+.card h3{margin-bottom:.4rem}
+.card p{margin:0;color:var(--dim);font-size:.95rem}
+
+.price{
+  border:1px solid var(--line);padding:1.5rem;max-width:34rem;
+}
+.price dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:.5rem 1.2rem}
+.price dt{font-family:var(--mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.price dd{margin:0;font-family:var(--mono);font-size:.95rem}
+.todo{color:var(--hot);font-weight:600}
+
+/* ---------- legal pages ---------- */
+.legal h2{font-size:1.2rem;margin:2.3rem 0 .5rem;color:var(--fg)}
+.legal h2:first-of-type{margin-top:1.5rem}
+.legal ul{padding-left:1.2rem;margin:0 0 1rem}
+.legal li{margin:.35rem 0}
+.legal .updated{font-family:var(--mono);font-size:.78rem;color:var(--dim);margin:0 0 2rem}
+.legal strong{font-weight:600}
+.fill-in{
+  background:var(--faint);padding:.05em .4em;
+  font-family:var(--mono);font-size:.88em;
+}
+
+a{color:var(--fg)}
+a:hover{opacity:.75}
+
+code{
+  font-family:var(--mono);font-size:.9em;
+  background:var(--faint);padding:.05em .35em;
+}
+
+/* ---------- footer ---------- */
+.site-foot{
+  border-top:1px solid var(--line);margin-top:4rem;padding:2rem 0 3rem;
+  font-family:var(--mono);font-size:.76rem;color:var(--dim);
+}
+.site-foot .wrap{display:flex;gap:1.4rem;flex-wrap:wrap;align-items:baseline}
+.site-foot nav{display:flex;gap:1.2rem;flex-wrap:wrap}
+.site-foot a{color:var(--dim);text-decoration:none}
+.site-foot a:hover{color:var(--fg)}
+.site-foot .copy{margin-left:auto}
+
+@media (max-width:40rem){
+  .site-foot .copy{margin-left:0;flex-basis:100%}
+}
